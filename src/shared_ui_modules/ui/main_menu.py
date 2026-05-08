@@ -63,12 +63,12 @@ class SharedMainMenuWindow(QMainWindow):
         self.side_menu_button_toggler(self.configButton)
 
     def conn_loss_dialog_handle(self):
+        self.stackedWidget.setCurrentIndex(0)
         warning = QMessageBox(self)
         warning.setWindowTitle(self.main_menu_dialog_string_list[0])
         warning.setText(QCoreApplication.translate(self.main_menu_dialog_string_list[1]))
         warning.setWindowModality(Qt.ApplicationModal)
         warning.show()
-        self.stackedWidget.setCurrentIndex(0)
 
     def no_connection_dialog_handle(self):
         warning = QMessageBox(self)
