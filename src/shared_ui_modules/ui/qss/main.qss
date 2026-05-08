@@ -1,0 +1,387 @@
+/*
+    Background #FFFFFF
+    foreground #F5F5F5
+    side bar #1D1B19
+    side bar button highlight #CB834B
+    side bar button/text #CB834B
+    search bar #353231
+    hightlights #F89E59
+    button #C3C3C3
+
+    main colors
+        #1D1B19
+        #F5F5F5
+        #F89E59
+        #FFFFFF
+ */
+
+/* ############################## Menu principal ##############################*/
+/* ############################## Menu principal ##############################*/
+/* ############################## Menu principal ##############################*/
+
+/*
+   Botões só de texto, menu principal
+ */
+
+*{
+   font-family: "Segoe UI";
+}
+
+QToolButton:disabled{
+   background-color:#797878;
+}
+
+QToolButton:hover{
+   background-color:#cccccc;
+}
+
+QToolButton{
+   padding: 1px;
+   border: 1px solid black;
+   background-color: #C3C3C3;
+   border-radius: 5%;
+   color: #000000;
+}
+
+QPushButton{
+   padding: 1px;
+   border: 1px solid black;
+   background-color: #C3C3C3;
+   border-radius: 4px;
+   color: #000000;
+}
+
+QPushButton:pressed{
+   background-color: #F89E59;
+}
+
+QPushButton:disabled{
+   background-color: #8a8a8a;
+}
+
+QPushButton:hover{
+   background-color: #cccccc;
+}
+
+QWidget#sideMenu_2>QPushButton{
+   background: none;
+   border: none;
+   margin: 1px;
+   padding: 1px;
+   text-decoration: underline;
+   font-size: 14pt;
+   color: #CB834B;
+   icon-size: 32px;
+   text-align: left;
+}
+
+QWidget#sideMenu_2>QPushButton:disabled{
+   color: #797878;
+}
+
+QWidget#sideMenu_2>QPushButton:hover{
+   color: #fda969;
+}
+
+QAbstractButton#connectionMenuButton{
+   qproperty-icon: url("_internal/resources/icons/no-connection._orange.png")
+}
+
+QAbstractButton#calibrationButton{
+   qproperty-icon: url("_internal/resources/icons/resilience_orange.png")
+}
+
+QAbstractButton#configButton{
+   qproperty-icon: url("_internal/resources/icons/knob_orange.png")
+}
+
+QAbstractButton#userActionsButton{
+   qproperty-icon: url("_internal/resources/icons/group_orange.png")
+}
+
+QAbstractButton#statsButton{
+   qproperty-icon: url("_internal/resources/icons/pie-chart_orange.png")
+}
+
+QAbstractButton#gameProfileButton{
+   qproperty-icon: url("_internal/resources/icons/game-profile_orange.png")
+}
+
+QWidget#sideMenu_2{
+   background-color: #1D1B19;
+   border-color: #D5D5D4;
+   padding: 1px;
+}
+
+QWidget#windowContainer{
+   background-color:  #F5F5F5;
+}
+
+QWidget#patientWidget{
+   border: 1px solid black;
+   border-radius: 25px; 
+   background-color: #F5F5F5;
+}
+
+QWidget#titleWidget{
+   border-bottom: 1px solid black; 
+   background-color: #F5F5F5;
+}
+
+QWidget#centralwidget{
+   background-color: white;
+}
+
+QWidget#stackedWidgetContainer{
+   border: 1px solid black;
+   border-radius: 25px; 
+   background-color: #F5F5F5;
+}
+
+QWidget#sideMenuLine{
+   color: #494847;
+   background-color: #494847;
+   margin-left: 14px;
+   margin-right: 14px;
+}
+
+QWidget#workplaceContainer{
+   background-color: white;
+}
+
+QWidget#logoLabel{
+   color: white;
+}
+
+/* ############################## Logger Window ##############################*/
+/* ############################## Logger Window ##############################*/
+/* ############################## Logger Window ##############################*/
+
+#logWindow{
+   background-color:#F5F5F5;
+   border: 1px solid black;
+   border-radius: 7px;
+   color: #000000;
+ }
+
+/* ############################## Title widget ##############################*/
+/* ############################## Title widget ##############################*/
+/* ############################## Title widget ##############################*/
+/* ############################## Patient widget ##############################*/
+/* ############################## Patient widget ##############################*/
+/* ############################## Patient widget ##############################*/
+
+
+QWidget#patientImage,#therapistImage{
+   border: 1px solid black;
+   border-radius: 30px;
+}
+
+
+/* ############################## Config widget ##############################*/
+/* ############################## Config widget ##############################*/
+/* ############################## Config widget ##############################*/
+
+QRadioButton#radioButtonLittle{
+   background-color: #FFE05F;
+}
+QRadioButton#radioButtonRing{
+   background-color: #FFC15F;
+}
+QRadioButton#radioButtonMiddle{
+   background-color: #FF9653;
+}
+QRadioButton#radioButtonIndex{
+   background-color: #ff8153;
+}
+
+QWidget#fingerButtonContainer_2>QRadioButton{
+   border: 1px solid black;
+   border-radius: 9px;
+   padding: 5px;
+   margin: 2px;
+}
+
+
+QWidget#repeatButtonContainer>QRadioButton::indicator {
+   border: 1px solid black;
+   border-radius: 6px;
+}
+
+QWidget#repeatButtonContainer>QRadioButton::indicator:checked {
+   background-color: #F89E59;
+}
+
+QWidget#pressureFingerContainer{
+   border: 1px solid black;
+   border-radius: 25px;
+}
+
+QWidget#optionsContainer{
+   border: 1px solid black;
+   border-radius: 25px;
+   padding: 1px;
+   margin: 1px;
+}
+
+
+QWidget#slider>QSlider::groove{
+   border: 1px solid black;
+   border-radius: 6px;
+   margin: 0px;
+}
+
+QWidget#slider>QSlider::add-page{
+   background: black;
+   border-radius: 6px;
+   margin: 0px;
+}
+
+QWidget#slider>QSlider::groove:disabled{
+   background: #EBEBE4; 
+}
+
+QWidget#slider > QSlider::handle:disabled {
+   background: transparent;
+   border: none;
+}
+
+QWidget#durationHelperLabel,#repeatHelperLabel{
+   color: #0000ff
+}
+
+/* ############################## Calibration widget ##############################*/
+/* ############################## Calibration widget ##############################*/
+/* ############################## Calibration widget ##############################*/
+
+QWidget#instructionImageLabel{
+   border: 1px solid black;
+   border-radius: 50%;
+}
+
+
+QWidget#instructionLabel{
+   font-size: 32pt;
+   text-align: center;
+}
+
+/* ############################## UserActions widget ##############################*/
+/* ############################## UserActions widget ##############################*/
+/* ############################## UserActions widget ##############################*/
+
+QWidget#tabWidget::pane {
+   border: 1px solid black;
+   border-radius: 10%;
+}
+
+QWidget#tabWidget::tab-bar {
+   left: 15px;
+}
+
+/* ############################## UserStats widget ##############################*/
+/* ############################## UserStats widget ##############################*/
+/* ############################## UserStats widget ##############################*/
+
+QWidget#statsTabWidget::pane {
+   border: 1px solid black;
+   border-radius: 10%;
+}
+
+QWidget#statsTabWidget::tab-bar {
+   left: 15px;
+}
+
+
+QWidget#handSelectorContainer>QRadioButton::indicator {
+   border: 1px solid black;
+   border-radius: 6px;
+}
+
+QWidget#handSelectorContainer>QRadioButton::indicator:checked {
+   background-color: #F89E59;
+}
+
+
+/* ############################## Connection manager widget ##############################*/
+/* ############################## Connection manager widget ##############################*/
+/* ############################## Connection manager widget ##############################*/
+
+/* saddly there are css changes inside the python class for the connection manager, in specific the device container */
+/* check the class for changes */
+
+QWidget#deviceContainerFrame{
+   border: 1px solid black;
+   border-radius: 10%;
+}
+
+QWidget#deviceContainer{
+   background: transparent;
+   border-radius: 10%;
+}
+
+/* ############################## List widgets ##############################*/
+/* ############################## List widgets ##############################*/
+/* ############################## List widgets ##############################*/
+
+QWidget#userItemForm{
+   background: transparent;
+}
+
+QWidget#userItemWidgetContainer{
+   background: transparent;
+}
+
+QWidget#listedDeviceForm{
+   background: transparent;
+}
+
+QWidget#listedDeviceWindowContainer{
+   background: transparent;
+}
+
+QListWidget::item:selected:active {
+   background-color: #F89E59
+}
+
+QListWidget::item {
+   background-color: #dedddd
+}
+
+QListWidget::item::hover {
+   background-color: #ececec
+}
+
+QListWidget::item{
+   border: 1px solid black;
+   border-radius: 10%;
+}
+
+QListWidget{
+   border: 1px solid black;  
+   border-radius: 10%;
+   padding: 10%;
+   background: transparent;
+}
+
+/* ############################## config profile widget ##############################*/
+/* ############################## config profile widget ##############################*/
+/* ############################## config profile widget ##############################*/
+
+QListWidget#gameProfileList::item:selected:!active{
+   background-color: #F89E59
+}
+
+
+QWidget#gameProfileLineEdit{
+   border: 1px solid black;
+   border-radius: 5%;
+   background: #dedddd;
+}
+
+QWidget#gameProfileLineEdit::focus{
+   background: #F89E59;
+}
+
+QWidget#gameProfileLineEdit::hover{
+   background: #ececec;
+}
