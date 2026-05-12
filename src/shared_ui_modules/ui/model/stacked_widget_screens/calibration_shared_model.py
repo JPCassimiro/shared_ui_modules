@@ -75,8 +75,7 @@ class SharedCalibrationModel(QWidget):
         self.string_list_instruction = []
         for string in self.str_array:
             self.string_list_instruction.append(string)
-        logger.debug(f"SharedCalibration set_translatable_strings: {self.string_list_instruction}")
-    
+            
     def set_instruction_image(self,img_path, width, height, radius = 0):
         try:
             img = QPixmap()

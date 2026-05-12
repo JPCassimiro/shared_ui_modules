@@ -42,20 +42,17 @@ class SharedDataCollectorClass(QObject):
                 self.send_serial_message("*L1")
                 time.sleep(0.5)#attemps to garantee that the response from L1 will be handled on the regular message listner
                 self.btSerialHandle.swap_message_listner(1)
-                # self.serialHandleClass.swap_message_listner(1)
                 self.btSerialHandle.mesReceivedSignal.connect(self.message_received_handler)
                 self.btSerialHandle.port_error.connect(self.serial_error_handler)
-                # self.serialHandleClass.mesReceivedSignal.connect(self.message_received_handler)
+                # self.btSerialHandle.fake_stat_data()
             else:
                 self.timer.stop()
+                self.btSerialHandle.swap_message_listner(0)
                 if self.btSerialHandle.socket_none_check():
                     self.timeout_handle()
                     return
-                self.btSerialHandle.swap_message_listner(0)
-                # self.serialHandleClass.swap_message_listner(0)
                 self.btSerialHandle.mesReceivedSignal.disconnect(self.message_received_handler)
                 self.btSerialHandle.port_error.disconnect(self.serial_error_handler)
-                # self.serialHandleClass.mesReceivedSignal.disconnect(self.message_received_handler)
                 self.timeout_handle()
                 self.send_serial_message("*L0")
         except Exception as e:

@@ -30,6 +30,7 @@ class SharedUserStatsModel(QWidget):
         self.csvWriter.exportError.connect(self.error_export_handle)
         self.dataCollectorHandler.errorOcurred.connect(self.data_collection_error_handle)
         self.exportSessionImageButton.clicked.connect(self.export_as_image_handler)
+        self.set_dialog_text()
 
     def data_collection_error_handle(self):
         if self.dataCollectorHandler.start_watch == True:

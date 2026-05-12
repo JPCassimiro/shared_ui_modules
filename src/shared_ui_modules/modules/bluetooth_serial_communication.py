@@ -7,7 +7,7 @@ import re
 
 baud_rate = 600
 
-class BtSerialComm(QObject):
+class SharedBtSerialComm(QObject):
 
     port_finish = Signal()
     port_error = Signal()
@@ -25,9 +25,25 @@ class BtSerialComm(QObject):
         self.pause_var = False
         self.message_buffer = ""
         self.use_data_buffer = ""
-        self.use_data_regex = r"\*I\d{12}"
+        self.use_data_regex = None
+        self.fake_test_data = None
         
         self.timer.timeout.connect(self.handle_timeout)
+
+    def initialize_module(self):
+        self.use_data_regex = self.get_use_data_get_regex() 
+        self.fake_test_data = self.get_fake_data()
+
+    def get_use_data_get_regex(self):
+        return
+
+    def get_fake_data(self):
+        return
+        
+    def fake_stat_data(self):
+        for message in self.fake_test_data:
+            self.use_data_buffer += message
+        self.recieve_use_data_message()
 
     def alter_port_state(self,state = True):
         if state == False:

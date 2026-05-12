@@ -24,12 +24,20 @@ class AppConfigClass(QObject):
             {"name":"English","path":"en_tr.qm"}
         ]
         
+        self.update_message_property = "block_update_message"
+        self.version_name_property = "ver"
+
         self.current_translator = None
     
     def write_ini_file(self, property, value):
         self.settings.setValue(property, value)
         self.settings.sync()
         return self.settings.status()
+            
+    def get_property(self,property):
+        prop = self.settings.value(property)
+        logger.debug(f"get_property prop: {prop}")
+        return prop
             
     def change_language(self,file,name):
         print(f"change_language - file: {file}")
@@ -53,24 +61,3 @@ class AppConfigClass(QObject):
                 logger.debug("Língua alterada com sucesso")
         elif(status != None and status != QSettings.Status.NoError):
             logger.debug("Erro ao alterar língua")
-
-    # def get_current_language(self):
-    #     current_langauge = self.settings.value("Language")
-    #     self.currentLangSignal.emit(current_langauge)
-    
-    # def change_language(self,file):
-    #     app = QApplication.instance()
-
-    #     if self.current_translator:
-    #         app.removeTranslator(self.current_translator)
-    #         self.current_translator = None
-
-    #     if file:
-    #         translator = QTranslator(app)
-    #         file_path = self.base_path_tr / file
-    #         res = translator.load(str(file_path))
-    #         if res:
-    #             self.current_translator = translator
-    #             print(f"change_language res: {res} - self.current_translator: {self.current_translator}")
-
-    # def write_config(self):

@@ -1,7 +1,9 @@
-from PySide6.QtWidgets import QPushButton, QMainWindow, QApplication, QMessageBox
-from PySide6.QtCore import QEvent, QCoreApplication, Qt
+from PySide6.QtWidgets import QPushButton, QMainWindow, QApplication, QMessageBox, QCheckBox
+from PySide6.QtCore import QEvent, QCoreApplication, Qt, Signal
 
-class SharedMainMenuWindow(QMainWindow):
+from shared_ui_modules.modules.log_class import logger
+
+class SharedMainMenuWindow(QMainWindow):    
     def __init__(self):
         super().__init__()
 
@@ -66,7 +68,7 @@ class SharedMainMenuWindow(QMainWindow):
         self.stackedWidget.setCurrentIndex(0)
         warning = QMessageBox(self)
         warning.setWindowTitle(self.main_menu_dialog_string_list[0])
-        warning.setText(QCoreApplication.translate(self.main_menu_dialog_string_list[1]))
+        warning.setText(self.main_menu_dialog_string_list[1])
         warning.setWindowModality(Qt.ApplicationModal)
         warning.show()
 
