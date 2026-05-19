@@ -3,6 +3,8 @@ from shared_ui_modules.ui.model.dialogs.register_model import RegisterModel
 
 from shared_ui_modules.modules.log_class import logger
 
+from shared_ui_modules.modules.db_functions import SharedDbClass
+
 from PySide6.QtWidgets import QWidget, QMessageBox
 from PySide6.QtGui import QPixmap
 from PySide6.QtCore import Signal, Qt, QCoreApplication
@@ -12,8 +14,10 @@ import re
 class UserItemModel(QWidget):
     
     updateList = Signal(int)
+    update_finish = Signal(bool)
+    delete_finish = Signal(bool)
     
-    def __init__(self, infoDict, DbHandleClass):
+    def __init__(self, infoDict: dict | None, DbHandleClass: SharedDbClass | None):
         super().__init__()
         
         #ui setup
@@ -63,35 +67,46 @@ class UserItemModel(QWidget):
             logger.error(f"Erro ao atribuir uma imagem na lista: {e}")
         
     def remove_button_handler(self):
-        q = f"delete from {self.item_table} where id = ? returning name;"
-        res = self.dbHandleClass.execute_single_query(q,[self.item_id])
-        if res: 
-            logger.debug(f"{res[0][0]} removido")
-            self.info_dict = None
-            self.updateList.emit(self.item_id)
+        try:
+            q = f"delete from {self.item_table} where id = ? returning name;"
+            res = self.dbHandleClass.execute_single_query(q,[self.item_id])
+            if res: 
+                logger.debug(f"{res[0][0]} removido")
+                self.info_dict = None
+                self.updateList.emit(self.item_id)
+                self.delete_finish.emit(True)
+        except Exception as e:
+            logger.debug(f"Erro na operação de exclusão de um cadastro - error: {e}")
+            self.delete_finish.emit(False)
         
     def edit_user(self):
-        update_info = self.register_modal.infoDict.copy()
-        rgx1 = True
-        rgx2 = True
-        if update_info["name"] != None: rgx1 = re.search("^\s*$",update_info["name"])
-        if update_info["details"] != None: rgx2 = re.search("^\s*$",update_info["details"])
-        if rgx1 == None and rgx2 == None:
-            q = f"update {self.item_table} set name = ?, details = ?, image_path = ? where id = ? returning id;"
-            res = self.dbHandleClass.execute_single_query(q,[update_info["name"],update_info["details"],update_info["image_path"],self.item_id])
-            if res:
-                self.info_dict = update_info.copy()
-                logger.debug(f"info do id {res[0][0]} da tabela {self.item_table} foi atualizado")
-                self.updateList.emit(self.item_id)
-        else:
-            warning = QMessageBox(self)
-            warning.setWindowTitle(QCoreApplication.translate("WarningText", "Erro"))
-            warning.setText(QCoreApplication.translate("WarningText", "Preencha todos os campos obrigatórios"))
+        try:
+            update_info = self.register_modal.infoDict.copy()
+            rgx1 = True
+            rgx2 = True
+            if update_info["name"] != None: rgx1 = re.search("^\s*$",update_info["name"])
+            if update_info["details"] != None: rgx2 = re.search("^\s*$",update_info["details"])
+            if rgx1 == None and rgx2 == None:
+                q = f"update {self.item_table} set name = ?, details = ?, image_path = ? where id = ? returning id;"
+                res = self.dbHandleClass.execute_single_query(q,[update_info["name"],update_info["details"],update_info["image_path"],self.item_id])
+                if res:
+                    self.info_dict = update_info.copy()
+                    logger.debug(f"info do id {res[0][0]} da tabela {self.item_table} foi atualizado")
+                    self.updateList.emit(self.item_id)
+                    self.update_finish.emit(True)
+            else:
+                warning = QMessageBox(self)
+                warning.setWindowTitle(QCoreApplication.translate("WarningText", "Erro"))
+                warning.setText(QCoreApplication.translate("WarningText", "Preencha todos os campos obrigatórios"))
 
-            warning.setWindowModality(Qt.ApplicationModal)
-            warning.show()
-            self.register_modal.reset_values()
-    
+                warning.setWindowModality(Qt.ApplicationModal)
+                warning.show()
+                self.register_modal.reset_values()
+        except Exception as e:
+            logger.debug(f"Erro ao editar cadastro - error: {e}")
+            self.update_finish.emit(False)
+
+        
     def edit_button_handler(self):
         self.register_modal.infoDict = self.info_dict.copy()
         self.register_modal.complete_fields()

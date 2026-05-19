@@ -1,6 +1,9 @@
 from shared_ui_modules.ui.views.calibration_widget_ui import Ui_calibrationForm
 from shared_ui_modules.modules.log_class import logger
 
+from shared_ui_modules.modules.bluetooth_serial_communication import SharedBtSerialComm
+from shared_ui_modules.ui.model.dialogs.log_model import SharedLogModel
+
 from PySide6.QtWidgets import QWidget
 from PySide6.QtGui import QPixmap
 from PySide6.QtCore import QTimer, Signal, QCoreApplication, QEvent
@@ -10,7 +13,7 @@ class SharedCalibrationModel(QWidget):
     pValuesSignal = Signal(list)
     sideMenuDisableSignal = Signal(bool)
     
-    def __init__(self,logModel,btSerialhandle):
+    def __init__(self,logModel: SharedLogModel | None, btSerialhandle: SharedBtSerialComm | None):
         super().__init__()
         
         #setup ui
@@ -127,7 +130,6 @@ class SharedCalibrationModel(QWidget):
         self.error_flag = False
 
     def port_error_handle(self):
-        self.logModel.append_log(f"Dispositivo não conectado")
         self.error_flag = True
         self.cancel_button_handler()
         
@@ -137,7 +139,6 @@ class SharedCalibrationModel(QWidget):
     
     #messages will be recieved in the same order as they are sent, per serial rules
     def recieve_serial_message(self,recieved):
-        self.logModel.append_log(recieved)
         if self.calibration_step == 0:
             self.handle_pressure_message_1(recieved)
         else:

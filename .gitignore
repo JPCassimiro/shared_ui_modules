@@ -1,0 +1,13 @@
+deployment
+pysidedeploy.spec
+build
+dist
+logs
+line.txt
+_internal/resources/latest_bindings
+_internal/resources/config
+jre.db
+dados_de_uso
+.vscode
+_internal/resources/cached_devices
+*.pyc

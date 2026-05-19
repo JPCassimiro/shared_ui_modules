@@ -47,6 +47,7 @@ class Ui_loggerForm(object):
         self.deviceListWidget = QListWidget(self.deviceListContainer)
         self.deviceListWidget.setObjectName(u"deviceListWidget")
         self.deviceListWidget.setFrameShadow(QFrame.Shadow.Plain)
+        self.deviceListWidget.setSpacing(5)
 
         self.gridLayout_3.addWidget(self.deviceListWidget, 1, 0, 1, 1)
 

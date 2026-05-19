@@ -1,4 +1,7 @@
 from shared_ui_modules.modules.desktop_services import DekstopServicesClass
+from shared_ui_modules.modules.db_functions import SharedDbClass
+from shared_ui_modules.modules.bluetooth_serial_communication import SharedBtSerialComm
+
 
 from PySide6.QtWidgets import QWidget, QPushButton, QRadioButton, QMessageBox
 from shared_ui_modules.modules.log_class import logger
@@ -11,7 +14,7 @@ from unidecode import unidecode
 
 class SharedUserStatsModel(QWidget):
 
-    def __init__(self,dbHandleClass, btSerialHandle, LogModel):
+    def __init__(self,dbHandleClass: SharedDbClass | None = None, btSerialHandle: SharedBtSerialComm | None = None, logModel = None):
         super().__init__()
 
         self.btSerialHandle = btSerialHandle
@@ -33,121 +36,163 @@ class SharedUserStatsModel(QWidget):
         self.set_dialog_text()
 
     def data_collection_error_handle(self):
-        if self.dataCollectorHandler.start_watch == True:
-            self.stop_button_handler()
-        # elif self.dataCollectorHandler.start_watch = False
-            # self.stop_button_handler()
-
+        try:
+            if self.dataCollectorHandler.start_watch == True:
+                self.stop_button_handler()
+            # elif self.dataCollectorHandler.start_watch = False
+                # self.stop_button_handler()
+        except Exception as e:
+            logger.debug(f"SharedUserStatsModel data_collection_error_handler error: {e}")
+        
     def end_export_handle(self, folder_path = None):
-        warning = QMessageBox(self)
-        warning.setWindowTitle(QCoreApplication.translate("WarningText", "Sucesso"))
-        warning.setText(QCoreApplication.translate("WarningText", "Exportação realizada com sucesso. A pasta criada será aberta."))
-        warning.setWindowModality(Qt.ApplicationModal)
-        warning.show()
-        if folder_path:
-            DekstopServicesClass().open_folder(folder_path)
+        try:
+            warning = QMessageBox(self)
+            warning.setWindowTitle(QCoreApplication.translate("WarningText", "Sucesso"))
+            warning.setText(QCoreApplication.translate("WarningText", "Exportação realizada com sucesso. A pasta criada será aberta."))
+            warning.setWindowModality(Qt.ApplicationModal)
+            warning.show()
+            if folder_path:
+                DekstopServicesClass().open_folder(folder_path)
+        except Exception as e:
+            logger.debug(f"SharedUserStatsModel end_export_handle error: {e}")
 
     def error_export_handle(self):
-        warning = QMessageBox(self)
-        warning.setWindowTitle(QCoreApplication.translate("WarningText", "Erro"))
-        warning.setText(QCoreApplication.translate("WarningText", "Erro na exportação"))
-        warning.setWindowModality(Qt.ApplicationModal)
-        warning.show()
+        try:
+            warning = QMessageBox(self)
+            warning.setWindowTitle(QCoreApplication.translate("WarningText", "Erro"))
+            warning.setText(QCoreApplication.translate("WarningText", "Erro na exportação"))
+            warning.setWindowModality(Qt.ApplicationModal)
+            warning.show()
+        except Exception as e:
+            logger.debug(f"SharedUserStatsModel error_export_handle error: {e}")
 
     def delete_charts(self):
-        self.summary_chart_layout_widget.deleteLater()
-        self.session_chart_layout_widget.deleteLater()
-        # self.ui.sessionChartContainer.layout().removeWidget(self.session_chart_layout_widget)
-        # self.ui.summaryChartContainer.layout().removeWidget(self.summary_chart_layout_widget)
-        
-    def delete_session_handler(self):
-        def on_accept():
-            current_index = self.sessionComboBox.currentData()
-            q = f"""delete from session where id = ? and patient_id = ? returning id;"""
-            res = self.dbHandleClass.execute_single_query(q,[current_index,self.current_user])
-            self.populate_comboBox()
-            if res:
-                deletionMessage = QMessageBox(self)
-                deletionMessage.setWindowTitle(self.string_list_dialog[4])
-                message = self.string_list_dialog[5]
-                message = message.format(id = res[0][0], user = self.current_user)
-                deletionMessage.setText(message)
-                deletionMessage.setWindowModality(Qt.ApplicationModal)
-                deletionMessage.show()
+        try:
+            self.summary_chart_layout_widget.deleteLater()
+            self.session_chart_layout_widget.deleteLater()
+            # self.ui.sessionChartContainer.layout().removeWidget(self.session_chart_layout_widget)
+            # self.ui.summaryChartContainer.layout().removeWidget(self.summary_chart_layout_widget)
+        except Exception as e:
+            logger.debug(f"SharedUserStatsModel delete_charts error: {e}")
 
-        deletionDialog = QMessageBox(self)
-        deletionDialog.setWindowTitle(self.string_list_dialog[3])
-        deletionDialog.setText(self.string_list_dialog[2])
-        deletionDialog.setWindowModality(Qt.ApplicationModal)
-        deletionDialog.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        yes_button = deletionDialog.button(QMessageBox.Yes)
-        no_button = deletionDialog.button(QMessageBox.No)
-        yes_button.setText(self.string_list_dialog[0])
-        no_button.setText(self.string_list_dialog[1])
-        deletionDialog.buttonClicked.connect(lambda btn: on_accept() if btn == yes_button else None)
-        deletionDialog.show()
-        
+    def delete_session_handler(self):
+        try:
+            def on_accept():
+                current_index = self.sessionComboBox.currentData()
+                q = f"""delete from session where id = ? and patient_id = ? returning id;"""
+                res = self.dbHandleClass.execute_single_query(q,[current_index,self.current_user])
+                self.populate_comboBox()
+                if res:
+                    deletionMessage = QMessageBox(self)
+                    deletionMessage.setWindowTitle(self.string_list_dialog[4])
+                    message = self.string_list_dialog[5]
+                    message = message.format(id = res[0][0], user = self.current_user)
+                    deletionMessage.setText(message)
+                    deletionMessage.setWindowModality(Qt.ApplicationModal)
+                    deletionMessage.show()
+
+            deletionDialog = QMessageBox(self)
+            deletionDialog.setWindowTitle(self.string_list_dialog[3])
+            deletionDialog.setText(self.string_list_dialog[2])
+            deletionDialog.setWindowModality(Qt.ApplicationModal)
+            deletionDialog.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+            yes_button = deletionDialog.button(QMessageBox.Yes)
+            no_button = deletionDialog.button(QMessageBox.No)
+            yes_button.setText(self.string_list_dialog[0])
+            no_button.setText(self.string_list_dialog[1])
+            deletionDialog.buttonClicked.connect(lambda btn: on_accept() if btn == yes_button else None)
+            deletionDialog.show()
+        except Exception as e:
+            logger.debug(f"SharedUserStatsModel delete_session_handler error: {e}")
+
     def stop_button_handler(self):
-        self.dataCollectorHandler.stop_data_collection()
-        self.button_toggler(self.stopListening)
-        self.update_session_chart_value()
-        self.update_summary_charts()
-        
+        try:
+            self.dataCollectorHandler.stop_data_collection()
+            self.button_toggler(self.stopListening)
+            self.update_session_chart_value()
+            self.update_summary_charts()
+        except Exception as e:
+            logger.debug(f"SharedUserStatsModel stop_button_handler error: {e}")
+
     def comboBox_change_handler(self):
-        current_index = self.sessionComboBox.currentData()
-        if (current_index != self.latest_session):
-            self.startListening.setEnabled(False)
-        else:
-            self.startListening.setEnabled(True)
-        self.update_session_chart_value()  
-        self.update_summary_charts()
-        
+        try:
+            current_index = self.sessionComboBox.currentData()
+            if (current_index != self.latest_session):
+                self.startListening.setEnabled(False)
+            else:
+                self.startListening.setEnabled(True)
+            self.update_session_chart_value()  
+            self.update_summary_charts()
+        except Exception as e:
+            logger.debug(f"SharedUserStatsModel comboBox_change_handler error: {e}")
+
     def start_button_handler(self):
-        if self.btSerialHandle.socket_none_check():
-            return
-        self.dataCollectorHandler.start_watch = True
-        self.button_toggler(self.startListening)
+        try:
+            if self.btSerialHandle.socket_none_check():
+                return
+            self.dataCollectorHandler.start_watch = True
+            self.button_toggler(self.startListening)
+        except Exception as e:
+            logger.debug(f"SharedUserStatsModel start_button_handler error: {e}")
 
     def new_session_button_handler(self):
-        session_id = self.create_session()
-        if session_id:
-            self.populate_comboBox()
+        try:
+            session_id = self.create_session()
+            if session_id:
+                self.populate_comboBox()
+        except Exception as e:
+            logger.debug(f"SharedUserStatsModel new_session_button_handler error: {e}")
 
     def assing_user(self,user_index,user_name):
-        self.current_user = user_index
-        self.dataCollectorHandler.current_user_index = self.current_user
-        self.current_user_name = user_name
-        self.populate_comboBox()
+        try:
+            self.current_user = user_index
+            self.dataCollectorHandler.current_user_index = self.current_user
+            self.current_user_name = user_name
+            self.populate_comboBox()
+        except Exception as e:
+            logger.debug(f"SharedUserStatsModel assing_user error: {e}")
 
     def create_session(self):
-        q = f"""insert into session (patient_id, session_date) values (?,datetime(current_timestamp,'localtime')) returning patient_id,id;"""
-        res = self.dbHandleClass.execute_single_query(q,[self.current_user])
-        if res:
-            logger.debug(f"Seção criada para o usuário {res[0][0]}")
-            return res[0][1]
-        else:
-            return False
+        try:
+            q = f"""insert into session (patient_id, session_date) values (?,datetime(current_timestamp,'localtime')) returning patient_id,id;"""
+            res = self.dbHandleClass.execute_single_query(q,[self.current_user])
+            if res:
+                logger.debug(f"Seção criada para o usuário {res[0][0]}")
+                return res[0][1]
+            else:
+                return False
+        except Exception as e:
+            logger.debug(f"SharedUserStatsModel create_session error: {e}")
 
     def get_sessions(self):
-        qSessions = f"select * from session where patient_id = ?;"
-        resSessions = self.dbHandleClass.execute_single_query(qSessions,[self.current_user])
-        if resSessions:
-            return resSessions
-        
+        try:
+            qSessions = f"select * from session where patient_id = ?;"
+            resSessions = self.dbHandleClass.execute_single_query(qSessions,[self.current_user])
+            if resSessions:
+                return resSessions
+        except Exception as e:
+            logger.debug(f"SharedUserStatsModel get_sessions error: {e}")
+
     def populate_comboBox(self):
-        self.sessionComboBox.clear()
-        sessions = self.get_sessions()
-        if sessions:
-            for s in sessions:
-                text = str(s[2])
-                latest_session = s[0]
-                self.assing_latest_session(latest_session)
-                self.sessionComboBox.addItem(text[:len(text)-3],s[0])
-            self.sessionComboBox.setCurrentIndex(self.sessionComboBox.count()-1)
+        try:
+            self.sessionComboBox.clear()
+            sessions = self.get_sessions()
+            if sessions:
+                for s in sessions:
+                    text = str(s[2])
+                    latest_session = s[0]
+                    self.assing_latest_session(latest_session)
+                    self.sessionComboBox.addItem(text[:len(text)-3],s[0])
+                self.sessionComboBox.setCurrentIndex(self.sessionComboBox.count()-1)
+        except Exception as e:
+            logger.debug(f"SharedUserStatsModel populate_comboBox error: {e}")
 
     def assing_latest_session(self,latest_session):
-        self.latest_session = latest_session
-        self.dataCollectorHandler.current_session_index = latest_session
+        try:
+            self.latest_session = latest_session
+            self.dataCollectorHandler.current_session_index = latest_session
+        except Exception as e:
+            logger.debug(f"SharedUserStatsModel assing_latest_session error: {e}")
 
     def set_dialog_text(self):
         #dialog text

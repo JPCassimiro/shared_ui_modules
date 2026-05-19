@@ -8,7 +8,7 @@ from PySide6.QtCore import QUuid
 class ListedDeviceItemModel(QWidget):
     
 
-    def __init__(self, deviceDict):
+    def __init__(self, deviceDict: dict):
         
         super().__init__()
 

@@ -1,8 +1,13 @@
 from shared_ui_modules.ui.views.game_profile_widget_ui import Ui_gameProfileWidgetForm
 
 from shared_ui_modules.modules.log_class import logger
+from shared_ui_modules.modules.db_functions import SharedDbClass
+from shared_ui_modules.modules.bluetooth_serial_communication import SharedBtSerialComm
 
 from shared_ui_modules.ui.model.components.end_config_model import SharedEndConfigModel
+from shared_ui_modules.ui.model.dialogs.log_model import SharedLogModel
+
+
 
 from PySide6.QtWidgets import QWidget, QListWidgetItem, QMessageBox, QPushButton
 from PySide6.QtCore import Qt, Signal, QCoreApplication, QEvent, QSize
@@ -13,8 +18,19 @@ class SharedGameProfileModel(QWidget):
 
     to_config = Signal(object)
 
-    def __init__(self, logModel, dbHandle, btSerialHandle):
+    def __init__(self, logModel: SharedLogModel | None = None, dbHandle: SharedDbClass | None = None, btSerialHandle: SharedBtSerialComm | None = None):
         super().__init__()
+        
+        self.log_model_translatable_strings = [
+            QCoreApplication.translate("LoggerWidgetText","Erro ao adicionar configuração ao perfil"),
+            QCoreApplication.translate("LoggerWidgetText","Erro ao criar novo perfil"),
+            QCoreApplication.translate("LoggerWidgetText","Novo perfil criado"),
+            QCoreApplication.translate("LoggerWidgetText","Configuração adicionada ao perfil selecionado"),
+            QCoreApplication.translate("LoggerWidgetText","Valores aplicados a tela de configuração"),
+            QCoreApplication.translate("LoggerWidgetText","Erro ao adicionar a configuração ao perfil"),
+            QCoreApplication.translate("LoggerWidgetText","Erro ao remover uma configuração do perfil selecionado"),
+            QCoreApplication.translate("LoggerWidgetText","Erro ao excluir um perfil de configurações")
+        ]
 
         #module setup
         self.logModel = logModel
@@ -143,7 +159,6 @@ class SharedGameProfileModel(QWidget):
             self.apply_config(binding_dict)
             self.selected_card = None
 
-
     def delete_game_profile_button(self):
         self.delete_game_profile()
 
@@ -220,14 +235,17 @@ class SharedGameProfileModel(QWidget):
                     
             logger.debug(f"create_new_config config:{config}")
 
-            res = self.dbHandle.execute_single_query(q,[self.selected_profile.data(Qt.ItemDataRole.UserRole),str(config).replace("'","\"")])
+            for c in config:
+                res = self.dbHandle.execute_single_query(q,[self.selected_profile.data(Qt.ItemDataRole.UserRole),str(c).replace("'","\"")])
             
             if res:
                 logger.debug(f"nova config criada: {res[0]}")
                 self.populate_config_list()
+                self.logModel.append_log(self.log_model_translatable_strings[3])
         except Exception as e:
             logger.debug(f"create_new_config error:{e}")
-        
+            self.logModel.append_log(self.log_model_translatable_strings[0])
+
     def create_new_profile(self):
         try:
             if self.gameProfileLineEdit.text() != "":
@@ -244,8 +262,10 @@ class SharedGameProfileModel(QWidget):
                     logger.debug(f"novo perfil criado: {res[0]}")
                     self.populate_game_profile_list()
                     self.gameProfileLineEdit.clear()
+                    self.logModel.append_log(self.log_model_translatable_strings[2])
         except Exception as e:
             self.handle_error_modal(QCoreApplication.translate("WarningText", "Erro ao tentar criar um perfil"))
+            self.logModel.append_log(self.log_model_translatable_strings[1])
             
     def game_profile_selection(self,item):
         try:
@@ -299,6 +319,7 @@ class SharedGameProfileModel(QWidget):
                 self.selected_card = None
         except Exception as e:
             logger.debug(f"delete_card error:{e}")
+            self.logModel.append_log(self.log_model_translatable_strings[5])
             
     def delete_game_profile(self):
         try:
@@ -314,6 +335,7 @@ class SharedGameProfileModel(QWidget):
                 logger.debug(f"delete_game_profile id:{res[0]}")
         except Exception as e:
             logger.debug(f"delete_card error:{e}")
+            self.logModel.append_log(self.log_model_translatable_strings[7])
             
     def standardize_serial_message(self,binding_dict):
         messages = []
@@ -353,16 +375,21 @@ class SharedGameProfileModel(QWidget):
             logger.debug(f"send_serial_message error:{e}")
         
     def apply_config(self,config_dict):
-        messages = self.standardize_serial_message(config_dict)
-        self.end_modal.sent_message_total = len(messages)  
-        self.btSerialHandle.mesReceivedSignal.connect(self.message_received_handler)
-        for message in messages:
-            self.send_serial_message(message)
-        self.end_modal.exec()
+        try:
+            messages = self.standardize_serial_message(config_dict)
+            self.end_modal.sent_message_total = len(messages)  
+            self.btSerialHandle.mesReceivedSignal.connect(self.message_received_handler)
+            for message in messages:
+                self.send_serial_message(message)
+            self.end_modal.exec()
+        except Exception as e:
+            logger.debug(f"Erro ao tentar aplicar a configuração selecionada ao controle - error: {e}")
+            self.logModel.append_log(self.log_model_translatable_strings[5])
 
     def to_config_screen(self, config):
         self.to_config.emit(config)
-        
+        self.logModel.append_log(self.log_model_translatable_strings[3])
+
     def handle_error_modal(self, message):
         warning = QMessageBox(self)
         warning.setWindowTitle(QCoreApplication.translate("WarningText", "Erro"))
@@ -379,4 +406,14 @@ class SharedGameProfileModel(QWidget):
     def changeEvent(self, event):
         if event.type() == QEvent.Type.LanguageChange:
             self.ui.retranslateUi(self)
+            self.log_model_translatable_strings = [
+                QCoreApplication.translate("LoggerWidgetText","Erro ao adicionar configuração ao perfil"),
+                QCoreApplication.translate("LoggerWidgetText","Erro ao criar novo perfil"),
+                QCoreApplication.translate("LoggerWidgetText","Novo perfil criado"),
+                QCoreApplication.translate("LoggerWidgetText","Configuração adicionada ao perfil selecionado"),
+                QCoreApplication.translate("LoggerWidgetText","Valores aplicados a tela de configuração"),
+                QCoreApplication.translate("LoggerWidgetText","Erro ao adicionar a configuração ao perfil"),
+                QCoreApplication.translate("LoggerWidgetText","Erro ao remover uma configuração do perfil selecionado"),
+                QCoreApplication.translate("LoggerWidgetText","Erro ao excluir um perfil de configurações")
+            ]
         return super().changeEvent(event)

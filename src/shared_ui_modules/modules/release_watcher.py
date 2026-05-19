@@ -1,5 +1,7 @@
 from shared_ui_modules.modules.log_class import logger
 
+from shared_ui_modules.modules.app_config_module import AppConfigClass
+
 from PySide6.QtCore import QObject, Signal
 
 import requests
@@ -8,7 +10,7 @@ class ReleaseWatcherClass(QObject):
     
     new_version = Signal()
     
-    def __init__(self, configModule, parent = None):
+    def __init__(self, configModule: AppConfigClass | None , parent = None):
         super().__init__()
 
         self.configModule = configModule

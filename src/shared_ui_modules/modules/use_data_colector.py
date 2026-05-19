@@ -1,11 +1,15 @@
 from PySide6.QtCore import QObject
 
 from shared_ui_modules.modules.log_class import logger
+from shared_ui_modules.modules.db_functions import SharedDbClass
+from shared_ui_modules.modules.bluetooth_serial_communication import SharedBtSerialComm
+
+from shared_ui_modules.ui.model.dialogs.log_model import SharedLogModel
 
 import time
 
 class SharedDataCollectorClass(QObject):
-    def __init__(self, dbHandleClass, btSerialHandle, logModel):
+    def __init__(self, dbHandleClass: SharedDbClass | None, btSerialHandle: SharedBtSerialComm | None, logModel: SharedLogModel | None):
         super().__init__()
         
         self.logModel = logModel
@@ -64,9 +68,12 @@ class SharedDataCollectorClass(QObject):
         self.timer.start(ms)
 
     def insert_data(self,q,data):
-        res = self.dbHandleClass.execute_multiple_queries(q,data)
-        if res:
-            logger.debug(f"estatisticas de uso inseridos na tabela: {res[0][0]}")
+        try:
+            res = self.dbHandleClass.execute_multiple_queries(q,data)
+            if res:
+                logger.debug(f"estatisticas de uso inseridos na tabela: {res[0][0]}")
+        except Exception as e:
+            logger.debug(f"SharedDataCollectorClass insert_data error: {e}")    
         
     def stop_data_collection(self):
         self.start_watch = False
@@ -74,7 +81,6 @@ class SharedDataCollectorClass(QObject):
     def serial_error_handler(self):
         logger.debug(f"SharedDataCollectorClass serial_error_handler")
         self.errorOcurred.emit(True)
-        
 
     def send_serial_message(self,message):
         # self.btSerialHandle.open_port()

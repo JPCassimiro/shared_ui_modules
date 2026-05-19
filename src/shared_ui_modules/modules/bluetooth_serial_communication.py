@@ -13,6 +13,7 @@ class SharedBtSerialComm(QObject):
     port_error = Signal()
     mesReceivedSignal = Signal(object)
     conn_lost = Signal()
+    log_modal_message = Signal(int)
 
     def __init__(self, parent = None):
         super().__init__(parent)
@@ -55,6 +56,7 @@ class SharedBtSerialComm(QObject):
         if not self.bt_socket:
             logger.debug(f"SharedBtSerialHandle none socket")
             self.port_error.emit()
+            self.log_modal_message.emit(2)
             return True
         else:
             return False

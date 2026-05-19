@@ -228,6 +228,10 @@ class BluetoothCommClass(QObject):
         for device in sorted_list:
             if device.name().lower() == target_device_name.lower():
                 self.hid_device_list.append(device)
+                #! testing lines
+                # device_copy = QBluetoothDeviceInfo(device)
+                # self.hid_device_list.append(device_copy)
+                #! testing lines
         if any(self.hid_device_list):
             logger.debug(f"hid_discovery_end self.hid_device_list: {len(self.hid_device_list)}")
             self.hid_finish.emit("hid")
@@ -321,6 +325,7 @@ class BluetoothCommClass(QObject):
     ################################## LE Functions #################################
     def low_energy_check(self,device):
         try:
+            logger.debug(f"BLuetoothCommClass low_energy_check device: {device}")
             #low energy controller setup for checking power state
             low_energy_controller = QLowEnergyController.createCentral(device)
 
@@ -332,9 +337,11 @@ class BluetoothCommClass(QObject):
             low_energy_controller.connectToDevice()
             
         except Exception as e:
+            logger.debug(f"BLuetoothCommClass low_energy_check error: {e}")
             self.le_error.emit()
         
-    def low_energy_error_handle(self):
+    def low_energy_error_handle(self,e):
+        logger.debug(f"BLuetoothCommClass low_energy_error_handle error: {e}")
         self.le_finish.emit(None)
 
     def low_energy_connect_handle(self):

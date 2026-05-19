@@ -1,10 +1,12 @@
 from shared_ui_modules.modules.log_class import logger
 
-from PySide6.QtStateMachine import QState
+from shared_ui_modules.modules.bluetooth_comunication import BluetoothCommClass
+
+from PySide6.QtStateMachine import QState, QStateMachine
 from PySide6.QtCore import Signal
 
 class IdleState(QState):
-    def __init__(self, machine, bluetoothHandle, functions = None):
+    def __init__(self, machine: QStateMachine | None, bluetoothHandle: BluetoothCommClass | None, functions = None):
         super().__init__(machine)
         self.machine = machine
         self.btHandle = bluetoothHandle
@@ -31,7 +33,7 @@ class DisconnectionState(QState):
     disc_finish = Signal()
     conn_start = Signal()
 
-    def __init__(self, machine, bluetoothHandle, btSerialHandle, functions = None):
+    def __init__(self, machine: QStateMachine | None, bluetoothHandle: BluetoothCommClass | None, btSerialHandle, functions = None):
         super().__init__(machine)
         self.machine = machine
         self.btHandle = bluetoothHandle
@@ -140,10 +142,10 @@ class DisconnectionState(QState):
                     return "disc_finish"
     
 class ErrorState(QState):
-    def __init__(self, machine, bluetoohHandle, functions = None):
+    def __init__(self, machine: QStateMachine | None, bluetoothHandle: BluetoothCommClass | None, functions = None):
         super().__init__(machine)
         self.machine = machine
-        self.btHandle = bluetoohHandle
+        self.btHandle = bluetoothHandle
         self.functions = functions
         
     def onEntry(self, event):
@@ -159,10 +161,10 @@ class ConnectionState(QState):
     
     conn_finish = Signal()
     
-    def __init__(self, machine, bluetoohHandle, functions = None):
+    def __init__(self, machine: QStateMachine | None, bluetoothHandle: BluetoothCommClass | None, functions = None):
         super().__init__(machine)
         self.machine = machine
-        self.btHandle = bluetoohHandle
+        self.btHandle = bluetoothHandle
         self.functions = functions
         
     def onEntry(self, event):
@@ -195,10 +197,10 @@ class DeviceSearchState(QState):
     search_end = Signal()
     fallback_finish = Signal(object)
     
-    def __init__(self, machine, bluetoohHandle, functions = None, logModel = None):
+    def __init__(self, machine: QStateMachine | None, bluetoothHandle: BluetoothCommClass | None, functions = None, logModel = None):
         super().__init__(machine)
         self.machine = machine
-        self.btHandle = bluetoohHandle
+        self.btHandle = bluetoothHandle
         self.functions = functions
         self.device_counter = 0
         self.logModel = logModel
@@ -206,7 +208,6 @@ class DeviceSearchState(QState):
 
     def onEntry(self, event):
         logger.debug("DeviceSearchState onEntry")
-        self.logModel.append_log("Procurando por dispositivos, aguarde...")
         self.device_counter = 0
         self.machine.search = True
         self.btHandle.unified_list = []
@@ -239,6 +240,7 @@ class DeviceSearchState(QState):
         logger.debug(f"DeviceSearchState device_power_check self.device_counter:{self.device_counter}")
         if self.device_counter > 0:
             for device in self.btHandle.hid_device_list:
+                logger.debug(f"DeviceSearchState device_power_check device: {device}")
                 self.btHandle.low_energy_check(device)
     
     def handle_power_finish(self, res):
@@ -250,11 +252,14 @@ class DeviceSearchState(QState):
             self.device_counter -= 1
 
         if self.device_counter == 0:
-            for controller in self.btHandle.le_controller_list:
+            logger.debug(f"DeviceSearchState handle_power_finish self.btHandle.le_controller_list: {self.btHandle.le_controller_list}")
+            for controller in self.btHandle.le_controller_list[:]:
+                logger.debug(f"DeviceSearchState handle_power_finish clear controller: {controller}")
                 self.clear_le_controller(controller)
             
     def clear_le_controller(self,controller):
         def on_disc():
+            logger.debug(f"clear_le_controller on_disc trigger")
             controller.deleteLater()
             self.btHandle.le_controller_list.pop(self.btHandle.le_controller_list.index(controller))
             if len(self.btHandle.le_controller_list) == 0:
@@ -262,6 +267,7 @@ class DeviceSearchState(QState):
                 logger.debug(f"clear_le_controller self.btHandle.unified_list: {self.btHandle.unified_list}")
                 self.service_null_check()
 
+        logger.debug(f"clear_le_controller start controller.state: {controller.state()}")
         controller.disconnected.connect(on_disc)
         controller.disconnectFromDevice()
         
@@ -355,10 +361,10 @@ class FindPortState(QState):
 
     pair_success = Signal(str)
 
-    def __init__(self, machine, bluetoohHandle, btSerialHandle, functions = None):
+    def __init__(self, machine: QStateMachine | None, bluetoothHandle: BluetoothCommClass | None, btSerialHandle, functions = None):
         super().__init__(machine)
         self.machine = machine
-        self.btHandle = bluetoohHandle
+        self.btHandle = bluetoothHandle
         self.btSerialHandle = btSerialHandle
         self.functions = functions
 

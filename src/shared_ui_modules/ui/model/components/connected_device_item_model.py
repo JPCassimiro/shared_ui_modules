@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QWidget
 
 class ConnectedDeviceModel(QWidget):
     
-    def __init__(self,deviceInfoDict):
+    def __init__(self,deviceInfoDict: dict):
         
         super().__init__()
 

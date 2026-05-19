@@ -1,6 +1,7 @@
 from shared_ui_modules.ui.views.connection_manager_ui import Ui_loggerForm
 
 from shared_ui_modules.modules.bluetooth_comunication import BluetoothCommClass
+from shared_ui_modules.modules.bluetooth_serial_communication import SharedBtSerialComm
 from shared_ui_modules.modules.log_class import logger
 # from modules.json_writer import JsonWriterClass
 from shared_ui_modules.modules.connection_manager_state_machine import (IdleState, DisconnectionState, 
@@ -8,9 +9,10 @@ from shared_ui_modules.modules.connection_manager_state_machine import (IdleStat
 
 from shared_ui_modules.ui.model.components.listed_device_item_model import ListedDeviceItemModel
 from shared_ui_modules.ui.model.components.connected_device_item_model import ConnectedDeviceModel
+from shared_ui_modules.ui.model.dialogs.log_model import SharedLogModel
 
 from PySide6.QtWidgets import QWidget, QListWidgetItem
-from PySide6.QtCore import Qt, Signal, QEvent
+from PySide6.QtCore import Qt, Signal, QEvent, QCoreApplication
 from PySide6.QtStateMachine import QStateMachine
 
 #basic widget funcionalitty
@@ -26,10 +28,20 @@ class SharedConnectionManagerModel(QWidget):
     to_idle = Signal()
     confirmed_conn_loss = Signal()
 
-    def __init__(self,  logModel, serialBtClass):
+    def __init__(self,  logModel: SharedLogModel | None, serialBtClass: SharedBtSerialComm | None):
 
         super().__init__()
 
+        self.logger_window_translatable_strings = [
+            QCoreApplication.translate("LoggerWidgetText","Dispositivo selecionado:"),
+            QCoreApplication.translate("LoggerWidgetText","Emparelhando dispositivo selecionado, aguarde..."),
+            QCoreApplication.translate("LoggerWidgetText","Sucesso no emparelhamento"),
+            QCoreApplication.translate("LoggerWidgetText","Desemparelhando dispositivo, aguarde..."),
+            QCoreApplication.translate("LoggerWidgetText","Sucesso no desemparelhamento"),
+            QCoreApplication.translate("LoggerWidgetText","Fim da busca por dispositivos"),
+            QCoreApplication.translate("LoggerWidgetText","Procurando por dispositivos, aguarde...")
+            
+        ]
 
         #modules setup
         self.bluetoothHandle = BluetoothCommClass()
@@ -59,6 +71,7 @@ class SharedConnectionManagerModel(QWidget):
         # self.serialBtClass.port_finish.connect(self.successful_pair)
         # self.serialHandleClass.port_finish.connect(self.successful_pair)
         self.unpairDeviceButton.clicked.connect(self.full_unpair)
+        self.reloadListButton.clicked.connect(lambda: self.logModel.append_log(self.logger_window_translatable_strings[6]))
         
         self.selected_list_item = None
         self.connected_device_watcher = False
@@ -179,13 +192,13 @@ class SharedConnectionManagerModel(QWidget):
             self.selected_device[1] = service_uuid
             self.machine.selected_device = self.selected_device
             self.selected_list_item = index.row()
-            self.logModel.append_log(f"Dispositivo selecionado: {self._selected_list_item+1}")
+            self.logModel.append_log(f"{self.logger_window_translatable_strings[0]} {self._selected_list_item+1}")
             logger.debug(f"device_select_handle self.selected_device: {self.selected_device}")
 
     #checks for selected devices and starts the full pair
     def pair_selected_device(self):
         if self.selected_device[0] and self.selected_device[1]:
-            self.logModel.append_log("Emparelhando dispositivo selecionado, aguarde...")
+            self.logModel.append_log(self.logger_window_translatable_strings[1])
             self.machine.full_pair = True
             
     #gets device addr            
@@ -211,11 +224,11 @@ class SharedConnectionManagerModel(QWidget):
         self.bluetoothHandle.paired_device = self.selected_device[0]
         self.selected_device = [None,None]
         self.selected_list_item = None
-        self.logModel.append_log("Sucesso no emparelhamento")
+        self.logModel.append_log(self.logger_window_translatable_strings[2])
         self.serialBtClass.conn_lost.connect(self.conn_lost_check)
         
     def full_unpair(self):
-        self.logModel.append_log("Desemparelhando dispositivo, aguarde...")
+        self.logModel.append_log(self.logger_window_translatable_strings[3])
         self.machine.full_pair = False
            
     def unpair_finish_handler(self):
@@ -226,7 +239,7 @@ class SharedConnectionManagerModel(QWidget):
         self.selected_list_item = None
         self.bluetoothHandle.paired_device = None
         self.connected_device_watcher = False
-        self.logModel.append_log("Sucesso no desemparelhamento")
+        self.logModel.append_log(self.logger_window_translatable_strings[4])
         self.to_idle.emit()
         
     #visually updates the list and atributes deviceDict to each item
@@ -259,6 +272,8 @@ class SharedConnectionManagerModel(QWidget):
                         
                     self.deviceListWidget.addItem(item_container)
                     self.deviceListWidget.setItemWidget(item_container,item)
+
+            self.logModel.append_log(self.logger_window_translatable_strings[5])
                     
         except IndexError as e:
             logger.debug(f"index out of range error")
