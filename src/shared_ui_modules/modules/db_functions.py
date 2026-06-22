@@ -20,15 +20,22 @@ class SharedDbClass(QObject):
         return
 
     def initialize_module(self):
-        self.initial_query_list = self.get_query_list()
-        self.db_name = self.get_db_name()
-        #variable setup
-        if self.db_name:
-            self.conn = sqlite3.connect(self.db_name+".db")
-            self.conn.execute("PRAGMA foreign_keys = ON;")#why do foreign keys need to be enabled?
-            self.cur = self.conn.cursor()
-            self.initialize_database()
-    
+        try:
+            self.initial_query_list = self.get_query_list()
+            self.db_name = self.get_db_name()
+            #variable setup
+
+            if not self.initial_query_list or not self.db_name:
+                raise(f"relevant components not recieved: {self.initial_query_list}, {self.db_name}")
+
+            if self.db_name:
+                self.conn = sqlite3.connect(self.db_name+".db")
+                self.conn.execute("PRAGMA foreign_keys = ON;")#why do foreign keys need to be enabled?
+                self.cur = self.conn.cursor()
+                self.initialize_database()
+        except Exception as e:
+            logger.error(f"SharedDbClass initialize_module error: {e}")    
+
     #add returning to every query
     def execute_single_query(self,q=None,values=None):
         if q[len(q) - 1] != ";":
@@ -50,7 +57,7 @@ class SharedDbClass(QObject):
             else:
                 return res
         except Exception as e:
-            logger.error(f"Erro ao tentar executar a seguinte query: \n{q}\nErro: {e}")
+            logger.error(f"SharedDbClass execute_single_query error: {e}\nquery: {q}")    
             
     def execute_multiple_queries(self,q=None,values_array=None):
         if q[len(q) - 1] != ";":
@@ -69,7 +76,7 @@ class SharedDbClass(QObject):
             else:
                 logger.error(f"Query: {q}\nValores: {q}")
         except Exception as e:
-            logger.error(f"Erro ao tentar executar a seguinte query: \n{q}\nErro: {e}")
+            logger.error(f"SharedDbClass execute_multiple_queries error: {e}\nquery: {q}")    
              
     def initialize_database(self):
         for q in self.initial_query_list:

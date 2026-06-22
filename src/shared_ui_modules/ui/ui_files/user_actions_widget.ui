@@ -52,13 +52,13 @@
            <widget class="QWidget" name="therapistListContainer" native="true">
             <layout class="QGridLayout" name="gridLayout_3">
              <item row="0" column="0">
-              <widget class="QWidget" name="buttonContainer1" native="true">
+              <widget class="QWidget" name="therapistButtonContainer" native="true">
                <layout class="QHBoxLayout" name="horizontalLayout_3">
                 <item>
-                 <widget class="QLineEdit" name="lineEdit1"/>
+                 <widget class="QLineEdit" name="therapistLineEdit"/>
                 </item>
                 <item>
-                 <widget class="QToolButton" name="toolButton1">
+                 <widget class="QToolButton" name="addTherapistButton">
                   <property name="toolTip">
                    <string comment="UserActionsHelper">Cadastrar um novo terapeuta</string>
                   </property>
@@ -97,7 +97,7 @@
               </widget>
              </item>
              <item row="1" column="0">
-              <widget class="QListWidget" name="listWidget1"/>
+              <widget class="QListWidget" name="therapistListWidget"/>
              </item>
             </layout>
            </widget>
@@ -113,13 +113,13 @@
            <widget class="QWidget" name="patientListContainer" native="true">
             <layout class="QVBoxLayout" name="verticalLayout">
              <item>
-              <widget class="QWidget" name="buttonContainer2" native="true">
+              <widget class="QWidget" name="patientButtonContainer" native="true">
                <layout class="QHBoxLayout" name="horizontalLayout_2">
                 <item>
-                 <widget class="QLineEdit" name="lineEdit2"/>
+                 <widget class="QLineEdit" name="patientLineEdit"/>
                 </item>
                 <item>
-                 <widget class="QToolButton" name="toolButton2">
+                 <widget class="QToolButton" name="addPatientButton">
                   <property name="text">
                    <string>...</string>
                   </property>
@@ -155,7 +155,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QListWidget" name="listWidget2"/>
+              <widget class="QListWidget" name="patientListWidget"/>
              </item>
             </layout>
            </widget>

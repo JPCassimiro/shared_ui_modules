@@ -1,4 +1,5 @@
 from shared_ui_modules.ui.views.connected_device_item_ui import Ui_selectedDeviceForm
+from shared_ui_modules.modules.log_class import logger
 
 from PySide6.QtWidgets import QWidget
 
@@ -31,8 +32,12 @@ class ConnectedDeviceModel(QWidget):
 
 
     def update_fields(self,deviceInfoDict):
-        self.macLabel.setText(deviceInfoDict["mac"])
-        self.deviceNameLabel.setText(deviceInfoDict["name"])
+        try:
+            self.macLabel.setText(deviceInfoDict["mac"])
+            self.deviceNameLabel.setText(deviceInfoDict["name"])
+        except Exception as e:
+            logger.error(f"ConnectedDeviceModel update_fields error: {e}")
+            
 
 
         

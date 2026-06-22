@@ -30,16 +30,25 @@ class ReleaseWatcherClass(QObject):
             if req:
                 self.req_json = req.json()
         except Exception as e:   
-            logger.error(f"ReleaseWatcherClass error: {e}")                 
+            logger.error(f"ReleaseWatcherClass return_api_request error: {e}")                 
 
     def get_current_name(self):
-        ver = self.configModule.get_property(self.configModule.version_name_property)
-        if ver:
-            self.current_name = ver
+        try:
+            ver = self.configModule.get_property(self.configModule.version_name_property)
+            if ver:
+                self.current_name = ver
+        except Exception as e:
+            logger.error(f"ReleaseWatcherClass get_current_name error: {e}")                 
 
-    def get_latets_name(self):
-        if self.req_json:
-            self.latest_name = self.req_json["name"]
+    def get_latest_name(self):
+        try:
+            if not self.req_json:
+                raise Exception("null json")
+
+            if self.req_json:
+                self.latest_name = self.req_json["name"]
+        except Exception as e:
+            logger.error(f"ReleaseWatcherClass get_latest_name error: {e}")                 
     
     def check_version_diference(self):
         if self.current_name != self.latest_name:
@@ -49,9 +58,12 @@ class ReleaseWatcherClass(QObject):
             logger.debug(f"same version!")
 
     def get_allow_update(self):
-        self.allow_update = bool(self.configModule.get_property(self.configModule.update_message_property))
+        try:
+            self.allow_update = bool(self.configModule.get_property(self.configModule.update_message_property))
+        except Exception as e:
+            logger.error(f"ReleaseWatcherClass get_allow_update error: {e}")                 
       
     def verification_handler(self):
         self.get_current_name()
-        self.get_latets_name()
+        self.get_latest_name()
         self.check_version_diference()

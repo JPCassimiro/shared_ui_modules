@@ -35,22 +35,31 @@ class SharedLogModel(QDialog):
         self.btSerialHandle.log_modal_message.connect(self.serial_handle_message)
 
     def serial_handle_message(self,mes):
-        logger.debug(f"serial_handle_message mes: {mes}")
-        self.append_log(self.translatable_strings[mes])
+        try:
+            logger.debug(f"serial_handle_message mes: {mes}")
+            self.append_log(self.translatable_strings[mes])
+        except Exception as e:
+            logger.error(f"SharedLogModel serial_handle_message error: {e}")
         
     def serial_message_append(self,message):
-        if message:
-            self.append_log(f"{self.translatable_strings[1]} {message}")
+        try:
+            if message:
+                self.append_log(f"{self.translatable_strings[1]} {message}")
+        except Exception as e:
+            logger.error(f"SharedLogModel serial_message_append error: {e}")
 
     def append_log(self,message):
         try:
             currentDate = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             self.logTextEdit.appendPlainText(f"{currentDate}\n{message}\n")
         except Exception as e:
-            logger.debug(f"Erro ao tentar adicionar uma mensagem a janela de mensagens  - erro: {e}")
+            logger.error(f"SharedLogModel append_log error: {e}")
         
     def clear_log(self):
-        self.logTextEdit.clear()
+        try:
+            self.logTextEdit.clear()
+        except Exception as e:
+            logger.error(f"SharedLogModel clear_log error: {e}")
 
     def set_ui_texts(self):
         self.setWindowTitle(self.translatable_strings[0])

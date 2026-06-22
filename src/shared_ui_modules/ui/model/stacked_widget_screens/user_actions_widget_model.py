@@ -32,7 +32,8 @@ class SharedUserActionsModel(QWidget):
             QCoreApplication.translate("LoggerWidgetText","Terapeuta padrão selecionado"),
             QCoreApplication.translate("LoggerWidgetText","Erro no processo de cadastro"),
             QCoreApplication.translate("LoggerWidgetText","Erro na alteração"),
-            QCoreApplication.translate("LoggerWidgetText","Erro na remoção")
+            QCoreApplication.translate("LoggerWidgetText","Erro na remoção"),
+            QCoreApplication.translate("LoggerWidgetText","Erro ao selecionar um cadastro")
         ]
         
         #setup ui
@@ -51,34 +52,34 @@ class SharedUserActionsModel(QWidget):
 
         #get ui elements
         self.tabWidget = self.ui.tabWidget
-        self.listWidget1 = self.ui.listWidget1
-        self.lineEdit1 = self.ui.lineEdit1
-        self.toolButton1 = self.ui.toolButton1
-        self.listWidget2 = self.ui.listWidget2
-        self.lineEdit2 = self.ui.lineEdit2
-        self.toolButton2 = self.ui.toolButton2
+        self.therapistListWidget = self.ui.therapistListWidget
+        self.therapistLineEdit = self.ui.therapistLineEdit
+        self.addTherapistButton = self.ui.addTherapistButton
+        self.patientListWidget = self.ui.patientListWidget
+        self.patientLineEdit = self.ui.patientLineEdit
+        self.addPatientButton = self.ui.addPatientButton
         self.defaultPatientButton = self.ui.defaultPatientButton
         self.defautlTherapistButton = self.ui.defautlTherapistButton
         
-        self.lineEdit1.setProperty("type",0)
-        self.lineEdit2.setProperty("type",1)
-        self.toolButton1.setProperty("type",0)
-        self.toolButton2.setProperty("type",1)
-        self.listWidget1.setProperty("type",0)
-        self.listWidget2.setProperty("type",1)
+        self.therapistLineEdit.setProperty("type",0)
+        self.patientLineEdit.setProperty("type",1)
+        self.addTherapistButton.setProperty("type",0)
+        self.addPatientButton.setProperty("type",1)
+        self.therapistListWidget.setProperty("type",0)
+        self.patientListWidget.setProperty("type",1)
         
-        self.lineEdit1.hide()
-        self.lineEdit2.hide()
+        self.therapistLineEdit.hide()
+        self.patientLineEdit.hide()
 
         #connections
-        self.toolButton1.clicked.connect(self.add_button_handler)
-        self.toolButton2.clicked.connect(self.add_button_handler)
-        self.register_modal.accepted.connect(self.register_user)
-        self.defautlTherapistButton.clicked.connect(self.select_default_therapist)
-        self.defaultPatientButton.clicked.connect(self.select_default_patient)
+        self.addTherapistButton.clicked.connect(self.add_button_handler)
+        self.addPatientButton.clicked.connect(self.add_button_handler)
+        self.register_modal.accepted.connect(self.handle_modal_accept)
+        self.defautlTherapistButton.clicked.connect(self.default_therapist_button_handler)
+        self.defaultPatientButton.clicked.connect(self.default_patient_button_handler)
         
-        self.listWidget1.clicked.connect(self.get_user)
-        self.listWidget2.clicked.connect(self.get_user)
+        self.therapistListWidget.clicked.connect(self.list_item_clicked_handler)
+        self.patientListWidget.clicked.connect(self.list_item_clicked_handler)
         
         self.populate_lists()
 
@@ -87,18 +88,46 @@ class SharedUserActionsModel(QWidget):
         self.register_modal.setWindowModality(Qt.ApplicationModal)
         
         #style adjustments
-        self.listWidget1.setSpacing(5)
-        self.listWidget2.setSpacing(5)
+        self.therapistListWidget.setSpacing(5)
+        self.patientListWidget.setSpacing(5)
+        
+    def handle_modal_accept(self):
+        try:
+            self.register_modal.text_normalization()
+            self.register_user()
+        except Exception as e:
+            logger.error(f"SharedUserActions handle_modal_accept error: {e}")
+            self.logModel.append_log(self.log_model_translatable_strings[7])
+
+    def default_patient_button_handler(self):
+        try:
+            self.select_default_patient()
+        except Exception as e:
+            logger.error(f"SharedUserActions default_patient_button_handler error: {e}")
+
+    def default_therapist_button_handler(self):
+        try:
+            self.select_default_therapist()
+        except Exception as e:
+            logger.error(f"SharedUserActions default_therapist_button_handler error: {e}")
 
     def select_default_patient(self):
-        signal_dict_p = self.default_p_dict.copy()
-        self.patientSelected.emit(signal_dict_p)
-        self.logModel.append_log(self.log_model_translatable_strings[5])
+        try:
+            signal_dict_p = self.default_p_dict.copy()
+            self.patientSelected.emit(signal_dict_p)
+            self.logModel.append_log(self.log_model_translatable_strings[5])
+        except Exception as e:
+            logger.error(f"SharedUserActions select_default_patient error: {e}")
+            raise
 
     def select_default_therapist(self):
-        signal_dict_t = self.default_t_dict.copy()
-        self.therapistSelected.emit(signal_dict_t)
-        self.logModel.append_log(self.log_model_translatable_strings[6])
+        try:
+            signal_dict_t = self.default_t_dict.copy()
+            self.therapistSelected.emit(signal_dict_t)
+            self.logModel.append_log(self.log_model_translatable_strings[6])
+        except Exception as e:
+            logger.error(f"SharedUserActions select_default_therapist error: {e}")
+            raise
 
     def assin_default_user(self):
         signal_dict_p = self.default_p_dict.copy()
@@ -132,14 +161,17 @@ class SharedUserActionsModel(QWidget):
 
             return p_dict, t_dict
         except Exception as e:
-            logger.debug(f"Erro ao tentar obterva laores de usuário padrão")
+            logger.error(f"SharedUserActions get_default_users error: {e}")
         
     def add_button_handler(self):
-        if self.sender().property("type") == 0:
-            self.register_modal.current_table = "therapist"
-        else:
-            self.register_modal.current_table = "patient"
-        self.register_modal.exec()
+        try:
+            if self.sender().property("type") == 0:
+                self.register_modal.current_table = "therapist"
+            else:
+                self.register_modal.current_table = "patient"
+            self.register_modal.exec()
+        except Exception as e:
+            logger.error(f"SharedUserActions add_button_handler error: {e}")
 
     #also creates a session on the current timestamp so the user_stats widget dosent break
     def register_user(self):
@@ -165,41 +197,60 @@ class SharedUserActionsModel(QWidget):
                 warning.show()
                 self.register_modal.reset_values()
         except Exception as e:
-            logger.debug(f"Erro no processo de cadastro - error: {e}")
-            self.logModel.append_log(self.log_model_translatable_strings[7])
+            logger.error(f"SharedUserActions register_user error: {e}")
+            raise
         
     def visually_update_list(self):
-        self.listWidget1.clear()
-        self.listWidget2.clear()
-        self.populate_lists()
+        try:
+            self.therapistListWidget.clear()
+            self.patientListWidget.clear()
+            self.populate_lists()
+        except Exception as e:
+            logger.error(f"SharedUserActions visually_update_list error: {e}")
+            raise
 
     def update_list_handler(self,itemId):
-        if itemId == self.current_patient:
-            if self.sender().info_dict == None:
-                signal_dict = self.default_p_dict.copy()
-            else:
-                signal_dict = self.sender().info_dict.copy()
-            self.patientSelected.emit(signal_dict)
-        elif itemId == self.current_therapist:
-            if self.sender().info_dict == None:
-                signal_dict = self.default_t_dict.copy()
-            else:
-                signal_dict = self.sender().info_dict.copy()
-            self.therapistSelected.emit(signal_dict)
-        self.visually_update_list()
+        try:
+            if itemId == self.current_patient:
+                if self.sender().info_dict == None:
+                    signal_dict = self.default_p_dict.copy()
+                else:
+                    signal_dict = self.sender().info_dict.copy()
+                self.patientSelected.emit(signal_dict)
+            elif itemId == self.current_therapist:
+                if self.sender().info_dict == None:
+                    signal_dict = self.default_t_dict.copy()
+                else:
+                    signal_dict = self.sender().info_dict.copy()
+                self.therapistSelected.emit(signal_dict)
+            self.visually_update_list()
+        except Exception as e:
+            logger.error(f"SharedUserActionsModel update_list_handler error: {e}")
+            raise
             
+    def list_item_clicked_handler(self,index):
+        try:
+            self.get_user(index)
+        except Exception as e:
+            logger.error(f"SharedUserActionsModel update_list_handler error: {e}")
+            self.logModel.append_log(self.log_model_translatable_strings[10])
+
     def get_user(self,index):
-        item = self.sender().item(index.row())
-        widget = self.sender().itemWidget(item)
-        signal_dict = widget.info_dict.copy()
-        if self.sender().property("type") == 0:
-            self.therapistSelected.emit(signal_dict)
-            self.current_therapist = widget.item_id
-            self.logModel.append_log(f"{self.log_model_translatable_strings[4]} {signal_dict["name"]}")
-        else:
-            self.patientSelected.emit(signal_dict)
-            self.current_patient = widget.item_id
-            self.logModel.append_log(f"{self.log_model_translatable_strings[3]} {signal_dict["name"]}")
+        try:
+            item = self.sender().item(index.row())
+            widget = self.sender().itemWidget(item)
+            signal_dict = widget.info_dict.copy()
+            if self.sender().property("type") == 0:
+                self.therapistSelected.emit(signal_dict)
+                self.current_therapist = widget.item_id
+                self.logModel.append_log(f"{self.log_model_translatable_strings[4]} {signal_dict["name"]}")
+            else:
+                self.patientSelected.emit(signal_dict)
+                self.current_patient = widget.item_id
+                self.logModel.append_log(f"{self.log_model_translatable_strings[3]} {signal_dict["name"]}")
+        except Exception as e:
+            logger.error(f"SharedUserActionsModel get_user error: {e}")
+            raise
 
     def populate_lists(self):
         try:
@@ -219,10 +270,10 @@ class SharedUserActionsModel(QWidget):
                         }
                         item = UserItemModel(infoDict,self.dbHandleClass)
                         item.updateList.connect(self.update_list_handler)
-                        item_container = QListWidgetItem(self.listWidget1)
+                        item_container = QListWidgetItem(self.therapistListWidget)
                         item_container.setSizeHint(item.sizeHint())                
-                        self.listWidget1.addItem(item_container)
-                        self.listWidget1.setItemWidget(item_container,item)
+                        self.therapistListWidget.addItem(item_container)
+                        self.therapistListWidget.setItemWidget(item_container,item)
             if res_patient: 
                 for patient in res_patient:
                     if patient[0] != 1:
@@ -235,12 +286,13 @@ class SharedUserActionsModel(QWidget):
                         }
                         item = UserItemModel(infoDict,self.dbHandleClass)
                         item.updateList.connect(self.update_list_handler)
-                        item_container = QListWidgetItem(self.listWidget2)
+                        item_container = QListWidgetItem(self.patientListWidget)
                         item_container.setSizeHint(item.sizeHint())                
-                        self.listWidget2.addItem(item_container)
-                        self.listWidget2.setItemWidget(item_container,item)
+                        self.patientListWidget.addItem(item_container)
+                        self.patientListWidget.setItemWidget(item_container,item)
         except Exception as e:
-            logger.debug(f"Erro ao popular a lista de cadastros - error: {e}")  
+            logger.error(f"SharedUserActionsModel populate_lists error: {e}")
+            raise
 
     def delete_finish_handler(self,res: bool):
         if res == True:

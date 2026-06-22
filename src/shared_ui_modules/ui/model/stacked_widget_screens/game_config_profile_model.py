@@ -7,8 +7,6 @@ from shared_ui_modules.modules.bluetooth_serial_communication import SharedBtSer
 from shared_ui_modules.ui.model.components.end_config_model import SharedEndConfigModel
 from shared_ui_modules.ui.model.dialogs.log_model import SharedLogModel
 
-
-
 from PySide6.QtWidgets import QWidget, QListWidgetItem, QMessageBox, QPushButton
 from PySide6.QtCore import Qt, Signal, QCoreApplication, QEvent, QSize
 
@@ -29,7 +27,9 @@ class SharedGameProfileModel(QWidget):
             QCoreApplication.translate("LoggerWidgetText","Valores aplicados a tela de configuração"),
             QCoreApplication.translate("LoggerWidgetText","Erro ao adicionar a configuração ao perfil"),
             QCoreApplication.translate("LoggerWidgetText","Erro ao remover uma configuração do perfil selecionado"),
-            QCoreApplication.translate("LoggerWidgetText","Erro ao excluir um perfil de configurações")
+            QCoreApplication.translate("LoggerWidgetText","Erro ao excluir um perfil de configurações"),
+            QCoreApplication.translate("LoggerWidgetText","Erro"),
+            QCoreApplication.translate("LoggerWidgetText","Ocorreu um erro no processo, tente novamente")
         ]
 
         #module setup
@@ -144,45 +144,101 @@ class SharedGameProfileModel(QWidget):
             self.addNewCardButton.setEnabled(True)
             
     def send_to_config_screen_handle(self):
-        if self.selected_card:
-            self.to_config_screen(self.selected_card.info_dict)
+        try:
+            if self.selected_card:
+                if not self.selected_card.info_dict:
+                    raise Exception("dict nulo")
+                self.to_config_screen(self.selected_card.info_dict)
+        except Exception as e:
+            logger.error(f"SharedGameProfileModel send_to_config_screen_handle error: {e}")
+            self.error_ocurred_process_cancel(self.log_model_translatable_strings[9])
 
     def apply_all_configs_handle(self):
-        if len(self.config_list) > 0:
-            for config in self.config_list:
-                bindindig_dict = config.info_dict 
-                self.apply_config(bindindig_dict)
+        try:
+            for d in self.config_list:
+                if not d.info_dict:#d.info_dict is null
+                    raise Exception("dict nulo")
+                    break
+                if len(self.config_list) > 0:
+                    for config in self.config_list:
+                        bindindig_dict = config.info_dict 
+                        self.apply_config(bindindig_dict)
+        except Exception as e:
+            self.error_ocurred_process_cancel(QCoreApplication.translate("WarningText", "Erro no processo de configuração do joystick"))
+            logger.error(f"SharedProfileModel apply_all_configs_handle error: {e}")
+            self.logModel.append_log(self.log_model_translatable_strings[5])
 
     def apply_selected_config_handle(self):
-        if self.selected_card:
-            binding_dict = self.selected_card.info_dict
-            self.apply_config(binding_dict)
-            self.selected_card = None
+        try:
+            if self.selected_card:
+                binding_dict = self.selected_card.info_dict
+                if not binding_dict:
+                    raise Exception("dict nulo")
+                self.apply_config(binding_dict)
+                self.selected_card = None
+        except Exception as e:
+            self.error_ocurred_process_cancel(QCoreApplication.translate("WarningText", "Erro no processo de configuração do joystick"))
+            logger.error(f"SharedProfileModel apply_all_configs_handle error: {e}")
+            self.logModel.append_log(self.log_model_translatable_strings[5])
 
     def delete_game_profile_button(self):
-        self.delete_game_profile()
+        try:
+            if not self.selected_profile:
+                raise Exception("Perfil não selecionado")
+            self.delete_game_profile()
+        except Exception as e:
+            self.logModel.append_log(self.log_model_translatable_strings[7])
 
     def card_select_handle(self,item):
-        self.config_card_selection(item)
+        try:
+            if not item:
+                raise Exception("Null item")
+            self.config_card_selection(item)
+        except Exception as e:
+            logger.debug(f"SharedGameProfiel card_select_handle error: {e}")
 
     def delete_buton_handle(self):
-        self.delete_card()
+        try:
+            if not self.selected_card:
+                raise Exception("Null card")
+            self.delete_card()
+        except Exception as e:
+            logger.debug(f"SharedGameProfiel delete_buton_handle error: {e}")
 
     def new_card_button_handle(self):
-        self.create_new_config()
+        try:
+            if not self.selected_profile:
+                raise Exception("null profile")
+            self.create_new_config()
+        except Exception as e:
+            logger.error(f"SharedGameProfile new_card_button_handle error: {e}")
+            self.logModel.append_log(self.log_model_translatable_strings[0])
 
     def new_profile_button_handle(self):
         if self.gameProfileLineEdit.text() != "":
             self.create_new_profile()
         else:
+            self.logModel.append_log(self.log_model_translatable_strings[1])
             self.handle_error_modal(QCoreApplication.translate("WarningText", "O campo do nome é obrigatório"))
 
     def profile_selection_handle(self,item):
-        self.game_profile_selection(item)
+        try:
+            if not item:
+                raise Exception("profile selection null")
+            self.game_profile_selection(item)
+        except Exception as e:
+            logger.error(f"SharedGameProfileModel profile_selection_handle error: {e}")
+            self.handle_error_modal(QCoreApplication.translate("WarningText", "Erro ao selecionar um perfil"))
 
     def config_card_selection(self,item):
-        card = self.cardListWidget.itemWidget(item)
-        self.selected_card = card
+        try:
+            if not item:
+                raise Exception("Null item")
+            card = self.cardListWidget.itemWidget(item)
+            self.selected_card = card
+        except Exception as e:
+            logger.error(f"SharedGameProfile config_card_selection error: {e}")
+            raise
 
     def assing_user(self,user_index):
         self.current_user = user_index
@@ -208,7 +264,7 @@ class SharedGameProfileModel(QWidget):
             self.gameProfileList.clear()
             self.get_profile_list()
             self.cardListWidget.clear()
-            self.selected_profile = None
+            self.config_list = []
             if len(self.profile_list) > 0:
                 for profile in self.profile_list:
                     item = QListWidgetItem()
@@ -216,15 +272,25 @@ class SharedGameProfileModel(QWidget):
                     item.setData(Qt.UserRole, profile[0])
                     item.setTextAlignment(Qt.AlignHCenter)
                     self.gameProfileList.addItem(item)
+            self.selected_card = None
+            self.selected_profile = None
         except Exception as e:
             logger.error(f"erro ao atualizar lista: {e}")
-                
+            
+            
     def read_json_file(self):
-        data = self.jsonWriter.read_json_file("_internal/resources/latest_bindings/user_bindings.json")
-        return data
+        try:
+            data = self.jsonWriter.read_json_file("_internal/resources/latest_bindings/user_bindings.json")
+            return data
+        except Exception as e:
+            logger.error(f"SharedGameProfile read_json_file error: {e}")
 
     def create_new_config(self):
         try:
+            
+            if not self.selected_profile:
+                raise Exception("null profile")
+            
             config = self.read_json_file()
 
             q = """insert 
@@ -233,8 +299,6 @@ class SharedGameProfileModel(QWidget):
                     values (?,?)
                     returning id;"""
                     
-            logger.debug(f"create_new_config config:{config}")
-
             for c in config:
                 res = self.dbHandle.execute_single_query(q,[self.selected_profile.data(Qt.ItemDataRole.UserRole),str(c).replace("'","\"")])
             
@@ -243,8 +307,8 @@ class SharedGameProfileModel(QWidget):
                 self.populate_config_list()
                 self.logModel.append_log(self.log_model_translatable_strings[3])
         except Exception as e:
-            logger.debug(f"create_new_config error:{e}")
-            self.logModel.append_log(self.log_model_translatable_strings[0])
+            logger.error(f"create_new_config error:{e}")
+            raise
 
     def create_new_profile(self):
         try:
@@ -264,8 +328,8 @@ class SharedGameProfileModel(QWidget):
                     self.gameProfileLineEdit.clear()
                     self.logModel.append_log(self.log_model_translatable_strings[2])
         except Exception as e:
-            self.handle_error_modal(QCoreApplication.translate("WarningText", "Erro ao tentar criar um perfil"))
-            self.logModel.append_log(self.log_model_translatable_strings[1])
+            logger.error(f"SharedGameProfileModel create_new_profile error: {e}")
+            raise
             
     def game_profile_selection(self,item):
         try:
@@ -275,7 +339,8 @@ class SharedGameProfileModel(QWidget):
             self.selected_card = None
             self.populate_config_list()
         except Exception as e:
-            self.handle_error_modal(QCoreApplication.translate("WarningText", "Erro ao selecionar um perfil"))
+            logger.debug(f"SharedGameProfileModel game_profile_selection error: {e}")
+            raise
     
     def populate_config_list(self):
         try:
@@ -300,14 +365,22 @@ class SharedGameProfileModel(QWidget):
                         self.config_list.append(card)
                 self.selected_profile_button_watcher()
         except Exception as e:
-            logger.debug(f"populate_config_list error:{e}")
+            logger.error(f"populate_config_list error: {e}")
+            raise
         
     def json_cleanup(self,bindings_text):
-        data = json.loads(bindings_text)
-        return data
+        try:
+            data = json.loads(bindings_text)
+            return data
+        except Exception as e:
+            logger.error(f"SharedGameProfileModel json_cleanup error: {e}")
+            raise
     
     def delete_card(self):
         try:
+            if not self.selected_card:
+                raise Exception("null card")
+            
             q = """
                 delete from bindings where id = ? returning id;"""
 
@@ -318,11 +391,15 @@ class SharedGameProfileModel(QWidget):
                 self.populate_config_list()
                 self.selected_card = None
         except Exception as e:
-            logger.debug(f"delete_card error:{e}")
+            logger.error(f"delete_card error:{e}")
             self.logModel.append_log(self.log_model_translatable_strings[5])
+            raise
             
     def delete_game_profile(self):
         try:
+            if not self.selected_profile:
+                raise Exception("Perfil não selecionado")
+
             q = """
                 delete from game_profile where id = ? returning id;"""
 
@@ -334,74 +411,91 @@ class SharedGameProfileModel(QWidget):
                 self.populate_game_profile_list()
                 logger.debug(f"delete_game_profile id:{res[0]}")
         except Exception as e:
-            logger.debug(f"delete_card error:{e}")
-            self.logModel.append_log(self.log_model_translatable_strings[7])
+            logger.error(f"delete_card error:{e}")
+            raise
             
-    def standardize_serial_message(self,binding_dict):
-        messages = []
+    def standardize_serial_message(self,binding_dict = None):
+        try:
+            if binding_dict != None:
+                messages = []
 
-        logger.debug(f"standardize_serial_message binding_dict: {binding_dict}")
+                value = binding_dict["pressure"]
+                valueStr = None
+                if int(value) != 0:
+                    valueStr = int(value)
+                    if(int(value) < 10):#value always needs to be sent in a 3 digit format 
+                        valueStr = f"00{int(value)}"
+                    elif(int(value) < 100):
+                        valueStr = f"0{int(value)}"
 
-        value = binding_dict["pressure"]
-        valueStr = None
-        if int(value) != 0:
-            valueStr = int(value)
-            if(int(value) < 10):#value always needs to be sent in a 3 digit format 
-                valueStr = f"00{int(value)}"
-            elif(int(value) < 100):
-                valueStr = f"0{int(value)}"
-
-        messages.append("*M{}{}".format(binding_dict["action"], valueStr))
-        
-        if binding_dict["repeat"] == "True":
-            messages.append("*R1")
-        else:
-            messages.append("*R0")
-        
-        if binding_dict["action"] == "1":
-            messages.append("*B" + binding_dict["key"])
-        else:
-            messages.append("*U" + binding_dict["key"])
-        
-        messages.append("*T" + binding_dict["duration"])
-        
-        return messages
+                messages.append("*M{}{}".format(binding_dict["action"], valueStr))
+                
+                if binding_dict["repeat"] == "True":
+                    messages.append("*R1")
+                else:
+                    messages.append("*R0")
+                
+                if binding_dict["action"] == "1":
+                    messages.append("*B" + binding_dict["key"])
+                else:
+                    messages.append("*U" + binding_dict["key"])
+                
+                messages.append("*T" + binding_dict["duration"])
+                
+                return messages
+            else:
+                raise Exception("dict nulo")
+        except Exception as e:
+            logger.error(f"SharedGameProfileModel error: {e}")
+            raise
 
     def send_serial_message(self, message):
         try:
             if self.btSerialHandle.bt_socket != None:
                 self.btSerialHandle.send_message(message)
         except Exception as e:
-            logger.debug(f"send_serial_message error:{e}")
+            logger.error(f"send_serial_message error:{e}")
+            raise
         
     def apply_config(self,config_dict):
         try:
-            messages = self.standardize_serial_message(config_dict)
-            self.end_modal.sent_message_total = len(messages)  
-            self.btSerialHandle.mesReceivedSignal.connect(self.message_received_handler)
-            for message in messages:
-                self.send_serial_message(message)
-            self.end_modal.exec()
+            if config_dict != None:
+                messages = self.standardize_serial_message(config_dict)
+                self.end_modal.sent_message_total = len(messages)  
+                self.btSerialHandle.mesReceivedSignal.connect(self.message_received_handler)
+                for message in messages:
+                    self.send_serial_message(message)
+                self.end_modal.exec()
+            else:
+                raise Exception("dict nulo") 
         except Exception as e:
-            logger.debug(f"Erro ao tentar aplicar a configuração selecionada ao controle - error: {e}")
-            self.logModel.append_log(self.log_model_translatable_strings[5])
+            logger.debug(f"SharedGameProfile apply_config - error: {e}")
+            raise
 
     def to_config_screen(self, config):
-        self.to_config.emit(config)
-        self.logModel.append_log(self.log_model_translatable_strings[3])
+        try:
+            self.to_config.emit(config)
+            self.logModel.append_log(self.log_model_translatable_strings[3])
+        except Exception as e:
+            logger.error(f"SharedGameProfileModel to_config_screen error: {e}")
+            raise
 
     def handle_error_modal(self, message):
-        warning = QMessageBox(self)
-        warning.setWindowTitle(QCoreApplication.translate("WarningText", "Erro"))
-        warning.setText(message)
-        warning.setWindowModality(Qt.ApplicationModal)
-        warning.show()
+        if message:
+            warning = QMessageBox(self)
+            warning.setWindowTitle(QCoreApplication.translate("WarningText", "Erro"))
+            warning.setText(message)
+            warning.setWindowModality(Qt.ApplicationModal)
+            warning.show()
 
     def finish_modal(self):
         self.btSerialHandle.mesReceivedSignal.disconnect(self.message_received_handler)
 
     def message_received_handler(self,response):
-        self.end_modal.recieve_end_message(response)
+        try:
+            self.end_modal.recieve_end_message(response)
+        except Exception as e:
+            logger.error(f"SharedGameProfileModel message_received_handler error: {e}")
 
     def changeEvent(self, event):
         if event.type() == QEvent.Type.LanguageChange:
@@ -414,6 +508,12 @@ class SharedGameProfileModel(QWidget):
                 QCoreApplication.translate("LoggerWidgetText","Valores aplicados a tela de configuração"),
                 QCoreApplication.translate("LoggerWidgetText","Erro ao adicionar a configuração ao perfil"),
                 QCoreApplication.translate("LoggerWidgetText","Erro ao remover uma configuração do perfil selecionado"),
-                QCoreApplication.translate("LoggerWidgetText","Erro ao excluir um perfil de configurações")
+                QCoreApplication.translate("LoggerWidgetText","Erro ao excluir um perfil de configurações"),
+                QCoreApplication.translate("LoggerWidgetText","Erro"),
+                QCoreApplication.translate("LoggerWidgetText","Ocorreu um erro no processo, tente novamente")
             ]
         return super().changeEvent(event)
+    
+    def error_ocurred_process_cancel(self,message = None):
+        self.handle_error_modal(message)
+        self.populate_game_profile_list()

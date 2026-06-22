@@ -45,28 +45,34 @@ class SharedEndConfigModel(QDialog):
                 self.finish_message()
     
     def finish_message(self):
-        logger.debug(f"EndConfigModel finish_message self.sent_message_total:{self.sent_message_total}")
-        if self.sent_message_total:
-            if sum(self._recieved_messages) != self.sent_message_total:
-                self.messageField.append(self.string_list_messages[0])
-            else:
-                self.messageField.append(self.string_list_messages[1])
-            self._recieved_messages = []
-            self.sent_message_total = 0
+        try:
+            logger.debug(f"EndConfigModel finish_message self.sent_message_total:{self.sent_message_total}")
+            if self.sent_message_total:
+                if sum(self._recieved_messages) != self.sent_message_total:
+                    self.messageField.append(self.string_list_messages[0])
+                else:
+                    self.messageField.append(self.string_list_messages[1])
+                self._recieved_messages = []
+                self.sent_message_total = 0
+        except Exception as e:
+            logger.error(f"SharedEndConfigModel finish_message error: {e}")
 
     def set_ui_text(self):
         self.setWindowTitle(self.string_list_components[0])
 
     def recieve_end_message(self,message):
-        logger.debug(f"recieve_end_message message:{message}")
-        if("N" in message):
-            self.recieved_messages = False
-            # self.messageField.append(self.string_list_messages[0])
-            # logger.debug(f"Erro ao configurar atributo")
-        else:
-            self.recieved_messages = True
-            # self.messageField.append(self.string_list_messages[1])
-            # logger.debug(f"Atributo configurado com sucesso")
+        try:
+            logger.debug(f"recieve_end_message message:{message}")
+            if("N" in message):
+                self.recieved_messages = False
+                # self.messageField.append(self.string_list_messages[0])
+                # logger.debug(f"Erro ao configurar atributo")
+            else:
+                self.recieved_messages = True
+                # self.messageField.append(self.string_list_messages[1])
+                # logger.debug(f"Atributo configurado com sucesso")
+        except Exception as e:
+            logger.error(f"SharedEndConfigModel recieve_end_message error: {e}")
 
     def finished_handler(self):
         self.messageField.clear()

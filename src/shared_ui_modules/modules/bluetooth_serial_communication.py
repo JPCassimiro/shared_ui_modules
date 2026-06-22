@@ -47,10 +47,13 @@ class SharedBtSerialComm(QObject):
         self.recieve_use_data_message()
 
     def alter_port_state(self,state = True):
-        if state == False:
-            self.bt_socket.close()
-        else:
-            self.bt_socket.open()
+        try:
+            if state == False:
+                self.bt_socket.close()
+            else:
+                self.bt_socket.open()
+        except Exception as e:
+            logger.error(f"SharedBtSeriaComm alter_port_state error: {e}")
 
     def socket_none_check(self):
         if not self.bt_socket:
@@ -68,10 +71,11 @@ class SharedBtSerialComm(QObject):
         try:
             if not self.bt_socket.isOpen():
                 if not self.bt_socket.open(QIODevice.ReadWrite):
-                    logger.error(f"Erro ao abrir porta serial: {self.bt_socket.errorString()}")
+                    raise Exception("Erro ao abrir porta")
         except AttributeError as e:
-            logger.debug(f"open_port error: {e}")
+            logger.error(f"SharedBtSerialComm open_port error: {e}")
             self.port_error.emit()
+            raise
             
     #on sucessfull read stop reading for 1 sec, deals with multiple messages of same value
     def start_timer(self):
@@ -79,21 +83,28 @@ class SharedBtSerialComm(QObject):
         self.pause_var = True
         
     def handle_timeout(self):
-        self.pause_var = False
-        self.bt_socket.readAll()#!find a way to clear the bt_socket port
+        try:
+            self.pause_var = False
+            self.bt_socket.readAll()#!find a way to clear the bt_socket port
+        except Exception as e:
+            logger.error(f"SharedBtSerialComm handle_timeout error: {e}")
 
     def swap_message_listner(self,op = 0):
-        if self.socket_none_check():
-            return
-        self.bt_socket.readyRead.disconnect()
-        if op == 0:#default
-            self.bt_socket.readyRead.connect(self.recieve_message)
-        elif op == 1:#use_data_collector
-            self.bt_socket.readyRead.connect(self.recieve_use_data_message)
+        try:
+            if self.socket_none_check():
+                return
+            self.bt_socket.readyRead.disconnect()
+            if op == 0:#default
+                self.bt_socket.readyRead.connect(self.recieve_message)
+            elif op == 1:#use_data_collector
+                self.bt_socket.readyRead.connect(self.recieve_use_data_message)
+        except Exception as e:
+            logger.error(f"SharedBtSerialComm swap_message_listner error: {e}")
+            raise
 
     #logs error on serial
     def handle_serial_error(self,err):
-        logger.debug(f"socket_error_handle error:{err}")
+        logger.error(f"SharedBtSerialComm socket_error_handle error:{err}")
         self.port_error.emit()
 
     #gets message from model class and writes it
@@ -105,7 +116,7 @@ class SharedBtSerialComm(QObject):
             encodedMessage = message.encode('utf-8')
             self.bt_socket.write(encodedMessage)
         except AttributeError as e:
-            logger.debug(f"send_message error: {e}")
+            logger.error(f"SharedBtSerialComm send_message error: {e}")
             self.port_error.emit()
 
     #gets message, decodes, sends signal
@@ -117,7 +128,6 @@ class SharedBtSerialComm(QObject):
             data = self.bt_socket.readAll()#these messages can be recieved in any way at any time, so it can be split or concateneted
             dataStr = data.toStdString()
             self.message_buffer += dataStr
-            print(f"recive_message:{self.message_buffer}")
             while "N" in self.message_buffer or "A" in self.message_buffer:
                 last_index = 0
                 for i, c in enumerate(self.message_buffer):#get the substring up to the limiter
@@ -130,7 +140,7 @@ class SharedBtSerialComm(QObject):
                 self.mesReceivedSignal.emit(m)
                 logger.debug(f"Mensagem recebida: {m}")
         except AttributeError as e:
-            logger.debug(f"recieve_message error: {e}")
+            logger.error(f"SharedBtSerialComm recieve_message error: {e}")
             self.port_error.emit()
 
 #receives sensor readings
@@ -144,7 +154,6 @@ class SharedBtSerialComm(QObject):
                 dataStr = data.toStdString()
                 self.use_data_buffer += dataStr
                 matches = list(re.finditer(self.use_data_regex,self.use_data_buffer))
-                print(f"recieve_use_data_message self.use_data_buffer:{self.use_data_buffer}\ndataStr:{dataStr}\nmatches:{matches}")
                 if matches:
                     last_match = matches[-1]
                     start, end = last_match.span()
@@ -156,7 +165,7 @@ class SharedBtSerialComm(QObject):
                 if messages:
                     self.mesReceivedSignal.emit(messages)
         except AttributeError as e:
-            logger.debug(f"recieve_use_data_message error: {e}")
+            logger.error(f"SharedBtSerialComm recieve_use_data_message error: {e}")
             self.port_error.emit()
 
     def create_service_socket(self, addr = None, uuid = None):
@@ -175,23 +184,30 @@ class SharedBtSerialComm(QObject):
             if addr and uuid:
                 logger.debug(f"create_service_socket service true")
                 self.bt_socket.connectToService(addr,uuid)
-        except:
+        except Exception as e:
+            logger.error(f"SharedBtSerialComm create_service_socket error: {e}")
             self.port_error.emit()
 
     def clear_socket(self):
-        if self.bt_socket:
-            self.bt_socket.disconnectFromService()
-            self.bt_socket.connected.disconnect(self.socket_connect_handle)
-            self.bt_socket.errorOccurred.disconnect(self.handle_serial_error)
-            self.bt_socket.readyRead.disconnect(self.recieve_message)
-            self.bt_socket.stateChanged.disconnect(self.socket_state_change)
-            self.bt_socket.deleteLater()
-
+        try:
+            if self.bt_socket:
+                self.bt_socket.disconnectFromService()
+                self.bt_socket.connected.disconnect(self.socket_connect_handle)
+                self.bt_socket.errorOccurred.disconnect(self.handle_serial_error)
+                self.bt_socket.readyRead.disconnect(self.recieve_message)
+                self.bt_socket.stateChanged.disconnect(self.socket_state_change)
+                self.bt_socket.deleteLater()
+        except Exception as e:
+            logger.error(f"SharedBtSerialComm clear_socket error: {e}")
+        
     def socket_connect_handle(self):
-        logger.debug(f"socket_connect_handle")
-        self.open_port()
-        self.send_message('0')
-        self.port_finish.emit()
+        try:
+            logger.debug(f"socket_connect_handle")
+            self.open_port()
+            self.send_message('0')
+            self.port_finish.emit()
+        except Exception as e:
+            logger.error(f"SharedBtSerialComm socket_connect_handle error: {e}")
 
     def socket_deleted(self):
         self.bt_socket = None
@@ -199,6 +215,11 @@ class SharedBtSerialComm(QObject):
     #check if socket state is UnconnectedState
     #this has to come after a RemoteHostClosedError or has to happen while a connected device object exist to be a problem
     def socket_state_change(self,state):
-        logger.debug(f"SharedBTSerial socket_state_change state: {state}")
-        if state == QBluetoothSocket.SocketState.UnconnectedState:
-            self.conn_lost.emit()
+        try:
+            logger.debug(f"SharedBTSerial socket_state_change state: {state}")
+            if state == QBluetoothSocket.SocketState.UnconnectedState:
+                self.conn_lost.emit()
+        except Exception as e:
+            logger.error(f"SharedBtSerialComm socket_state_change error: {e}")
+
+        

@@ -48,7 +48,20 @@ class UserItemModel(QWidget):
         #connections
         self.removeButton.clicked.connect(self.remove_button_handler)
         self.editButton.clicked.connect(self.edit_button_handler)
-        self.register_modal.accepted.connect(self.edit_user)
+        self.register_modal.accepted.connect(self.handle_modal_accept)
+        
+    def edit_button_handler(self):
+        try:
+            self.edit_info_modal_exec()
+        except Exception as e:
+            logger.error(f"UserItemModel edit_button_handler error: {e}")
+    
+    def remove_button_handler(self):
+        try:
+            self.remove_user()
+        except Exception as e:
+            logger.error(f"UserItemModel remove_button_handler error: {e}")
+            self.delete_finish.emit(False)
         
     def fill_fields(self,infoDict):
         self.set_image(infoDict["image_path"])
@@ -66,7 +79,7 @@ class UserItemModel(QWidget):
         except Exception as e:
             logger.error(f"Erro ao atribuir uma imagem na lista: {e}")
         
-    def remove_button_handler(self):
+    def remove_user(self):
         try:
             q = f"delete from {self.item_table} where id = ? returning name;"
             res = self.dbHandleClass.execute_single_query(q,[self.item_id])
@@ -76,8 +89,15 @@ class UserItemModel(QWidget):
                 self.updateList.emit(self.item_id)
                 self.delete_finish.emit(True)
         except Exception as e:
-            logger.debug(f"Erro na operação de exclusão de um cadastro - error: {e}")
-            self.delete_finish.emit(False)
+            logger.error(f"UserItemModel remove_user error: {e}")
+            raise            
+        
+    def handle_modal_accept(self):
+        try:
+            self.edit_user()
+        except Exception as e:
+            logger.error(f"UserItemModel handle_modal_accept error: {e}")
+            self.update_finish.emit(False)
         
     def edit_user(self):
         try:
@@ -103,11 +123,14 @@ class UserItemModel(QWidget):
                 warning.show()
                 self.register_modal.reset_values()
         except Exception as e:
-            logger.debug(f"Erro ao editar cadastro - error: {e}")
-            self.update_finish.emit(False)
-
+            logger.error(f"UserItemModel edit_user error: {e}")
+            raise
         
-    def edit_button_handler(self):
-        self.register_modal.infoDict = self.info_dict.copy()
-        self.register_modal.complete_fields()
-        self.register_modal.exec()
+    def edit_info_modal_exec(self):
+        try:
+            self.register_modal.infoDict = self.info_dict.copy()
+            self.register_modal.complete_fields()
+            self.register_modal.exec()
+        except Exception as e:
+            logger.error(f"UserItemModel edit_info_modal_exec error: {e}")
+            raise

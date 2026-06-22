@@ -44,23 +44,23 @@ class Ui_usersWidgetForm(object):
         self.therapistListContainer.setObjectName(u"therapistListContainer")
         self.gridLayout_3 = QGridLayout(self.therapistListContainer)
         self.gridLayout_3.setObjectName(u"gridLayout_3")
-        self.buttonContainer1 = QWidget(self.therapistListContainer)
-        self.buttonContainer1.setObjectName(u"buttonContainer1")
-        self.horizontalLayout_3 = QHBoxLayout(self.buttonContainer1)
+        self.therapistButtonContainer = QWidget(self.therapistListContainer)
+        self.therapistButtonContainer.setObjectName(u"therapistButtonContainer")
+        self.horizontalLayout_3 = QHBoxLayout(self.therapistButtonContainer)
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.lineEdit1 = QLineEdit(self.buttonContainer1)
-        self.lineEdit1.setObjectName(u"lineEdit1")
+        self.therapistLineEdit = QLineEdit(self.therapistButtonContainer)
+        self.therapistLineEdit.setObjectName(u"therapistLineEdit")
 
-        self.horizontalLayout_3.addWidget(self.lineEdit1)
+        self.horizontalLayout_3.addWidget(self.therapistLineEdit)
 
-        self.toolButton1 = QToolButton(self.buttonContainer1)
-        self.toolButton1.setObjectName(u"toolButton1")
+        self.addTherapistButton = QToolButton(self.therapistButtonContainer)
+        self.addTherapistButton.setObjectName(u"addTherapistButton")
         icon = QIcon(QIcon.fromTheme(QIcon.ThemeIcon.ListAdd))
-        self.toolButton1.setIcon(icon)
+        self.addTherapistButton.setIcon(icon)
 
-        self.horizontalLayout_3.addWidget(self.toolButton1)
+        self.horizontalLayout_3.addWidget(self.addTherapistButton)
 
-        self.defautlTherapistButton = QPushButton(self.buttonContainer1)
+        self.defautlTherapistButton = QPushButton(self.therapistButtonContainer)
         self.defautlTherapistButton.setObjectName(u"defautlTherapistButton")
 
         self.horizontalLayout_3.addWidget(self.defautlTherapistButton)
@@ -70,12 +70,12 @@ class Ui_usersWidgetForm(object):
         self.horizontalLayout_3.addItem(self.horizontalSpacer_2)
 
 
-        self.gridLayout_3.addWidget(self.buttonContainer1, 0, 0, 1, 1)
+        self.gridLayout_3.addWidget(self.therapistButtonContainer, 0, 0, 1, 1)
 
-        self.listWidget1 = QListWidget(self.therapistListContainer)
-        self.listWidget1.setObjectName(u"listWidget1")
+        self.therapistListWidget = QListWidget(self.therapistListContainer)
+        self.therapistListWidget.setObjectName(u"therapistListWidget")
 
-        self.gridLayout_3.addWidget(self.listWidget1, 1, 0, 1, 1)
+        self.gridLayout_3.addWidget(self.therapistListWidget, 1, 0, 1, 1)
 
 
         self.gridLayout_2.addWidget(self.therapistListContainer, 0, 0, 1, 1)
@@ -89,22 +89,22 @@ class Ui_usersWidgetForm(object):
         self.patientListContainer.setObjectName(u"patientListContainer")
         self.verticalLayout = QVBoxLayout(self.patientListContainer)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.buttonContainer2 = QWidget(self.patientListContainer)
-        self.buttonContainer2.setObjectName(u"buttonContainer2")
-        self.horizontalLayout_2 = QHBoxLayout(self.buttonContainer2)
+        self.patientButtonContainer = QWidget(self.patientListContainer)
+        self.patientButtonContainer.setObjectName(u"patientButtonContainer")
+        self.horizontalLayout_2 = QHBoxLayout(self.patientButtonContainer)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.lineEdit2 = QLineEdit(self.buttonContainer2)
-        self.lineEdit2.setObjectName(u"lineEdit2")
+        self.patientLineEdit = QLineEdit(self.patientButtonContainer)
+        self.patientLineEdit.setObjectName(u"patientLineEdit")
 
-        self.horizontalLayout_2.addWidget(self.lineEdit2)
+        self.horizontalLayout_2.addWidget(self.patientLineEdit)
 
-        self.toolButton2 = QToolButton(self.buttonContainer2)
-        self.toolButton2.setObjectName(u"toolButton2")
-        self.toolButton2.setIcon(icon)
+        self.addPatientButton = QToolButton(self.patientButtonContainer)
+        self.addPatientButton.setObjectName(u"addPatientButton")
+        self.addPatientButton.setIcon(icon)
 
-        self.horizontalLayout_2.addWidget(self.toolButton2)
+        self.horizontalLayout_2.addWidget(self.addPatientButton)
 
-        self.defaultPatientButton = QPushButton(self.buttonContainer2)
+        self.defaultPatientButton = QPushButton(self.patientButtonContainer)
         self.defaultPatientButton.setObjectName(u"defaultPatientButton")
 
         self.horizontalLayout_2.addWidget(self.defaultPatientButton)
@@ -114,12 +114,12 @@ class Ui_usersWidgetForm(object):
         self.horizontalLayout_2.addItem(self.horizontalSpacer)
 
 
-        self.verticalLayout.addWidget(self.buttonContainer2)
+        self.verticalLayout.addWidget(self.patientButtonContainer)
 
-        self.listWidget2 = QListWidget(self.patientListContainer)
-        self.listWidget2.setObjectName(u"listWidget2")
+        self.patientListWidget = QListWidget(self.patientListContainer)
+        self.patientListWidget.setObjectName(u"patientListWidget")
 
-        self.verticalLayout.addWidget(self.listWidget2)
+        self.verticalLayout.addWidget(self.patientListWidget)
 
 
         self.gridLayout_4.addWidget(self.patientListContainer, 0, 0, 1, 1)
@@ -146,15 +146,15 @@ class Ui_usersWidgetForm(object):
         self.tabWidget.setToolTip(QCoreApplication.translate("usersWidgetForm", u"Cadastrar um novo paciente", u"UserActionsHelper"))
 #endif // QT_CONFIG(tooltip)
 #if QT_CONFIG(tooltip)
-        self.toolButton1.setToolTip(QCoreApplication.translate("usersWidgetForm", u"Cadastrar um novo terapeuta", u"UserActionsHelper"))
+        self.addTherapistButton.setToolTip(QCoreApplication.translate("usersWidgetForm", u"Cadastrar um novo terapeuta", u"UserActionsHelper"))
 #endif // QT_CONFIG(tooltip)
-        self.toolButton1.setText(QCoreApplication.translate("usersWidgetForm", u"...", None))
+        self.addTherapistButton.setText(QCoreApplication.translate("usersWidgetForm", u"...", None))
 #if QT_CONFIG(tooltip)
         self.defautlTherapistButton.setToolTip(QCoreApplication.translate("usersWidgetForm", u"Retornar ao valor de terapeuta padr\u00e3o", u"UserActionsHelper"))
 #endif // QT_CONFIG(tooltip)
         self.defautlTherapistButton.setText(QCoreApplication.translate("usersWidgetForm", u"Terapeuta padr\u00e3o", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.therapistTab), QCoreApplication.translate("usersWidgetForm", u"Terapeuta", None))
-        self.toolButton2.setText(QCoreApplication.translate("usersWidgetForm", u"...", None))
+        self.addPatientButton.setText(QCoreApplication.translate("usersWidgetForm", u"...", None))
 #if QT_CONFIG(tooltip)
         self.defaultPatientButton.setToolTip(QCoreApplication.translate("usersWidgetForm", u"Retornar ao valor de paciente padr\u00e3o", u"UserActionsHelper"))
 #endif // QT_CONFIG(tooltip)

@@ -76,6 +76,7 @@ class Ui_gameProfileWidgetForm(object):
         self.cardListWidget.setObjectName(u"cardListWidget")
         self.cardListWidget.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.cardListWidget.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.cardListWidget.setMovement(QListView.Movement.Static)
         self.cardListWidget.setFlow(QListView.Flow.LeftToRight)
         self.cardListWidget.setResizeMode(QListView.ResizeMode.Adjust)
         self.cardListWidget.setSpacing(5)

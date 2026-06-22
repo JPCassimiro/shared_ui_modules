@@ -43,9 +43,12 @@ class SharedAppConfigModel(QDialog):
         self.set_ui_text()
 
     def update_verification(self):
-        self.releaseWatcher.get_allow_update()
-        if self.releaseWatcher.allow_update != True:
-            self.releaseWatcher.verification_handler()
+        try:
+            self.releaseWatcher.get_allow_update()
+            if self.releaseWatcher.allow_update != True:
+                self.releaseWatcher.verification_handler()
+        except Exception as e:
+            logger.error(f"SharedAppConfigModel update_verification error: {e}")
 
     def get_api_endpoint(self):
         return
@@ -63,36 +66,52 @@ class SharedAppConfigModel(QDialog):
         self.setWindowTitle(self.string_list_components[0])
             
     def language_comboBox_change_handler(self):
-        self.select_language()
+        try:
+            self.select_language()
+        except Exception as e:
+            logger.error(f"SharedAppConfigModel language_comboBox_change_handler error: {e}")
 
     def select_language(self):
-        print(f"{self.sender().objectName()} - {self.sender().currentIndex()}")        
-        self.configModule.change_language(self.languageComboBox.currentData(),self.languageComboBox.currentText())
+        try:
+            self.configModule.change_language(self.languageComboBox.currentData(),self.languageComboBox.currentText())
+        except Exception as e:
+            logger.error(f"SharedAppConfigModel select_language error: {e}")
+            raise
 
     def populate_language_comboBox(self):
-        self.languageComboBox.clear() 
-        current_index = -1
-        if self.configModule.language_list:
-            for i,l in enumerate(self.configModule.language_list):
-                self.languageComboBox.addItem(l["name"],l["path"])
-                if self.current_language == l["name"]:
-                    current_index = i
-            self.languageComboBox.setCurrentIndex(current_index)    
-    
+        try:
+            self.languageComboBox.clear() 
+            current_index = -1
+            if self.configModule.language_list:
+                for i,l in enumerate(self.configModule.language_list):
+                    self.languageComboBox.addItem(l["name"],l["path"])
+                    if self.current_language == l["name"]:
+                        current_index = i
+                self.languageComboBox.setCurrentIndex(current_index)    
+        except Exception as e:
+            logger.error(f"SharedAppConfigModel populate_language_comboBox error: {e}")
+            
     def new_version_handler(self):
-        logger.debug(f"SharedMainMenu new_version_handler")
-        warning = QMessageBox(self)
-        warning.setWindowTitle(self.string_list_components[1])
-        warning.setText(self.string_list_components[2])
-        cb = QCheckBox(self.string_list_components[3],warning)
-        warning.setCheckBox(cb)
-        warning.setWindowModality(Qt.ApplicationModal)
-        warning.exec()
-        if cb.isChecked():
-            self.block_update_message()
+        try:
+            logger.debug(f"SharedMainMenu new_version_handler")
+            warning = QMessageBox(self)
+            warning.setWindowTitle(self.string_list_components[1])
+            warning.setText(self.string_list_components[2])
+            cb = QCheckBox(self.string_list_components[3],warning)
+            warning.setCheckBox(cb)
+            warning.setWindowModality(Qt.ApplicationModal)
+            warning.exec()
+            if cb.isChecked():
+                self.block_update_message()
+        except Exception as e:
+            logger.error(f"SharedAppConfigModel new_version_handler error: {e}")
 
     def block_update_message(self):
-        self.configModule.write_ini_file(self.configModule.update_message_property,"True")
+        try:
+            self.configModule.write_ini_file(self.configModule.update_message_property,"True")
+        except Exception as e:
+            logger.error(f"SharedAppConfigModel block_update_message error: {e}")
+            raise
 
     def changeEvent(self, event):
         if event.type() == QEvent.Type.LanguageChange:

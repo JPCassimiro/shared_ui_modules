@@ -1,4 +1,5 @@
 from shared_ui_modules.ui.views.key_select_modal_ui import Ui_keySelectModalDialog
+from shared_ui_modules.modules.log_class import logger
 
 from PySide6.QtWidgets import QDialog, QDialogButtonBox
 from PySide6.QtCore import QObject, QEvent, Qt, QCoreApplication
@@ -78,40 +79,52 @@ class SharedKeySelectModel(QDialog):
         self.rejected.connect(self.cancel_operation_handler)
         self.accepted.connect(self.accepted_operation_handler)
 
-        self.set_ui_text()
+        self.set_ui_text()        
 
     def set_ui_text(self):
         self.setWindowTitle(QCoreApplication.translate("KeySelectText","Use o teclado para selecionar"))
         self.ui.buttonBox.button(QDialogButtonBox.Cancel).setText(self.string_list_components[0])
 
     def showEvent(self, arg__1):
-        for b in self.buttonBox.buttons():
-            b.clearFocus()
-        return super().showEvent(arg__1)
+        try:
+            for b in self.buttonBox.buttons():
+                b.clearFocus()
+            return super().showEvent(arg__1)
+        except Exception as e:
+            logger.error(f"SharedKeySelectModel showEvent error: {e}")
     
     def confirm_button_handler(self):
-        if self.selected_key == None:
-            self.warningLabel.show()
-        else:
-            self.warningLabel.hide()
-            self.accept()
-        print(f"{self.sender().objectName()}")
+        try:
+            if self.selected_key == None:
+                self.warningLabel.show()
+            else:
+                self.warningLabel.hide()
+                self.accept()
+        except Exception as e:
+            logger.error(f"SharedKeySelectModel confirm_button_handler error: {e}")
         
     def cancel_button_handler(self):
-        self.warningLabel.hide()
-        self.reject()
-        print(f"{self.sender().objectName()}")
+        try:
+            self.warningLabel.hide()
+            self.reject()
+        except Exception as e:
+            logger.error(f"SharedKeySelectModel cancel_button_handler error: {e}")
 
     def clean_button_handler(self):
-        self.selected_key = None
-        self.keyDisplayer.clear()
-        print(f"{self.sender().objectName()}")
+        try:
+            self.selected_key = None
+            self.keyDisplayer.clear()
+        except Exception as e:
+            logger.error(f"SharedKeySelectModel clean_button_handler error: {e}")
         
     def cancel_operation_handler(self):
-        self.z_c_key_mode = 0
-        self.keyDisplayer.clear()
-        self.selected_key = None
-        
+        try:
+            self.z_c_key_mode = 0
+            self.keyDisplayer.clear()
+            self.selected_key = None
+        except Exception as e:
+            logger.error(f"SharedKeySelectModel cancel_operation_handler error: {e}")
+            
     def accepted_operation_handler(self):
         self.keyDisplayer.clear()
         
@@ -127,24 +140,27 @@ class SharedKeySelectModel(QDialog):
 class KeyPressHandler(QObject):
     
     def eventFilter(self, widget, event):
-        if event.type() == QEvent.Type.KeyPress:
-            key = event.text()
-            if event.key() != Qt.Key_Enter:
-                if not key.strip():
-                    key = self.key_text_fix(event)
-                widget.selected_key = key
-                widget.keyDisplayer.clear()
-                if key not in ["UP", "DOWN", "LEFT", "RIGHT"]:
-                    widget.keyDisplayer.setText(key.upper())
-                elif key == "UP":
-                    widget.keyDisplayer.setText(str("↑"))
-                elif key == "DOWN":
-                    widget.keyDisplayer.setText(str("↓"))
-                elif key == "LEFT":
-                    widget.keyDisplayer.setText(str("←"))
-                elif key == "RIGHT":
-                    widget.keyDisplayer.setText(str("→"))
-        return False
+        try:
+            if event.type() == QEvent.Type.KeyPress:
+                key = event.text()
+                if event.key() != Qt.Key_Enter:
+                    if not key.strip():
+                        key = self.key_text_fix(event)
+                    widget.selected_key = key
+                    widget.keyDisplayer.clear()
+                    if key not in ["UP", "DOWN", "LEFT", "RIGHT"]:
+                        widget.keyDisplayer.setText(key.upper())
+                    elif key == "UP":
+                        widget.keyDisplayer.setText(str("↑"))
+                    elif key == "DOWN":
+                        widget.keyDisplayer.setText(str("↓"))
+                    elif key == "LEFT":
+                        widget.keyDisplayer.setText(str("←"))
+                    elif key == "RIGHT":
+                        widget.keyDisplayer.setText(str("→"))
+            return False
+        except Exception as e:
+            logger.error(f"KeyPressHandler eventFilter error: {e}")
     
     def key_text_fix(self, key_event):
         key_code = key_event.key()

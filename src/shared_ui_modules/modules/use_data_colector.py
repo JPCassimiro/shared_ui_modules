@@ -40,7 +40,7 @@ class SharedDataCollectorClass(QObject):
         try:
             if self._start_watch != False:
                 if self.btSerialHandle.socket_none_check():
-                    raise Exception
+                    raise Exception("Null socket")
                     return
                 self.start_data_collection(2500)
                 self.send_serial_message("*L1")
@@ -73,13 +73,13 @@ class SharedDataCollectorClass(QObject):
             if res:
                 logger.debug(f"estatisticas de uso inseridos na tabela: {res[0][0]}")
         except Exception as e:
-            logger.debug(f"SharedDataCollectorClass insert_data error: {e}")    
+            logger.error(f"SharedDataCollectorClass insert_data error: {e}")    
         
     def stop_data_collection(self):
         self.start_watch = False
 
     def serial_error_handler(self):
-        logger.debug(f"SharedDataCollectorClass serial_error_handler")
+        logger.error(f"SharedDataCollectorClass serial_error_handler")
         self.errorOcurred.emit(True)
 
     def send_serial_message(self,message):

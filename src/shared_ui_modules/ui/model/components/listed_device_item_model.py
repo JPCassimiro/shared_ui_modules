@@ -1,4 +1,5 @@
 from shared_ui_modules.ui.views.listed_device_item_ui import Ui_listedDeviceForm
+from shared_ui_modules.modules.log_class import logger
 
 from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import QEvent, QCoreApplication
@@ -37,15 +38,17 @@ class ListedDeviceItemModel(QWidget):
         self.set_texts()
         
     def set_texts(self):
-        device_satus = QCoreApplication.translate("DeviceText","Desligado")
-        device_name =  QCoreApplication.translate("DeviceText","Dispositivo {num}")
-        device_name = device_name.format(num = self.deviceDict["listName"])
-        self.listedDeviceAddressLabel.setText(self.deviceDict["mac"])
-        self.listedDeviceNameLabel.setText(device_name if self.deviceDict["turned_on"] == True else f"{device_name} - {device_satus}")
+        try:
+            device_satus = QCoreApplication.translate("DeviceText","Desligado")
+            device_name =  QCoreApplication.translate("DeviceText","Dispositivo {num}")
+            device_name = device_name.format(num = self.deviceDict["listName"])
+            self.listedDeviceAddressLabel.setText(self.deviceDict["mac"])
+            self.listedDeviceNameLabel.setText(device_name if self.deviceDict["turned_on"] == True else f"{device_name} - {device_satus}")
+        except Exception as e:
+            logger.error(f"ListedDeviceItemModel set_texts error: {e}")
 
     def changeEvent(self, event):
         if event.type() == QEvent.Type.LanguageChange:
-            print(f"ListedDeviceItemModel changeEvent")
             self.ui.retranslateUi(self)
             self.set_texts()
         return super().changeEvent(event)
