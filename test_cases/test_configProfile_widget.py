@@ -134,47 +134,35 @@ class TestConfigProfile:
         assert self.game_profile.gameProfileList.count() == 0
         assert self.game_profile.selected_profile == None
 
-    # def test_add_config_to_profile_success(self,qtbot,monkeypatch):
-    #     qtbot.wait(100)
-    #     qtbot.addWidget(self.game_profile)
+    def test_add_config_to_profile_success(self,qtbot,monkeypatch):
+        qtbot.wait(100)
+        qtbot.addWidget(self.game_profile)
 
-    #     self.game_profile.gameProfileLineEdit.setText("Profile 1")
+        self.game_profile.gameProfileLineEdit.setText("Profile 1")
 
-    #     self.game_profile.newGameProfileButton.click()
+        self.game_profile.newGameProfileButton.click()
 
-    #     qtbot.waitUntil(
-    #         lambda: self.game_profile.gameProfileList.count() > 0,
-    #     )
+        qtbot.waitUntil(
+            lambda: self.game_profile.gameProfileList.count() > 0,
+        )
         
-    #     item = self.game_profile.gameProfileList.item(0)
-    #     widget_pos = self.game_profile.gameProfileList.visualItemRect(item)
+        item = self.game_profile.gameProfileList.item(0)
+        widget_pos = self.game_profile.gameProfileList.visualItemRect(item)
 
-    #     qtbot.mouseClick(
-    #         self.game_profile.gameProfileList.viewport(),
-    #         Qt.LeftButton,
-    #         pos = widget_pos.center()
-    #     )
+        qtbot.mouseClick(
+            self.game_profile.gameProfileList.viewport(),
+            Qt.LeftButton,
+            pos = widget_pos.center()
+        )
         
-    #     self.game_profile.addNewCardButton.click()
+        self.game_profile.addNewCardButton.click()
 
-    #     qtbot.waitUntil(
-    #         lambda: self.game_profile.cardListWidget.count() > 0
-    #     )
+        qtbot.waitUntil(
+            lambda: self.game_profile.cardListWidget.count() > 0
+        )
 
-    #     card_item = self.game_profile.cardListWidget.itemWidget(self.game_profile.cardListWidget.item(0))
-        
-    #     print(f"card_item.objectName(): {card_item.objectName()}")
-        
-    #     sigSpy_card_list_clicked = QSignalSpy(self.game_profile.cardListWidget.itemClicked)
+        assert self.game_profile.cardListWidget.count() == 1
 
-    #     qtbot.mouseClick(
-    #         card_item,
-    #         Qt.LeftButton
-    #     )
-
-    #     qtbot.waitUntil(
-    #         lambda: self.game_profile.selected_card is not None
-    #     )
 
     def test_standardize_serial_message_function_success(self,qtbot,monkeypatch):
         d = {"pressure":100,"repeat":"True","action":"1","duration":"0","key":"A"}

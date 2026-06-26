@@ -1,4 +1,5 @@
 from PySide6.QtWidgets import QWidget
+from shared_ui_modules.modules.log_class import logger
 
 class SharedConfigWidgetModel(QWidget):
     def __init__(self, btSerialHandle, LogModel):
@@ -6,7 +7,7 @@ class SharedConfigWidgetModel(QWidget):
 
     def message_normalization(self,p,action):
         try:
-            if not p or not action:
+            if p is None or action is None:
                 raise Exception(f"null p or action: {p},{action}")
             
             valueStr = ""

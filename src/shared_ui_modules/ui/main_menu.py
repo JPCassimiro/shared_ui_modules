@@ -24,7 +24,7 @@ class SharedMainMenuWindow(QMainWindow):
 
     def therapist_select_handler(self,infoDict):
         try:
-            if not infoDict:
+            if infoDict is None:
                 raise Exception(f"null infoDict: {infoDict}")
             self.title_widget.info_dict = infoDict.copy()
             self.title_widget.update_fields()
@@ -33,7 +33,7 @@ class SharedMainMenuWindow(QMainWindow):
         
     def patient_select_handler(self,infoDict):
         try:
-            if not infoDict:
+            if infoDict is None:
                 raise Exception(f"null infoDict: {infoDict}")
             
             self.patient_widget.info_dict = infoDict.copy()
@@ -47,6 +47,8 @@ class SharedMainMenuWindow(QMainWindow):
             
     def log_button_handler(self):
         self.logModel.open()
+        self.logModel.raise_()
+        self.logModel.activateWindow()
 
     # toggles side menu buttons accordingly
     def side_menu_button_toggler(self, clicked_button):
@@ -78,7 +80,7 @@ class SharedMainMenuWindow(QMainWindow):
 
     def to_config_signal_handle(self,config):
         try:
-            if not config:
+            if config is None:
                 raise Exception(f"null config: {config}")
             self.config_widget.assing_card_values(config)
             self.stackedWidget.setCurrentIndex(1)

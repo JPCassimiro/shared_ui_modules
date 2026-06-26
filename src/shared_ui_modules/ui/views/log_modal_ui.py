@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'log_modal.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.3
+## Created by: Qt User Interface Compiler version 6.10.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -22,7 +22,8 @@ class Ui_logDialogForm(object):
     def setupUi(self, logDialogForm):
         if not logDialogForm.objectName():
             logDialogForm.setObjectName(u"logDialogForm")
-        logDialogForm.resize(292, 228)
+        logDialogForm.resize(250, 200)
+        logDialogForm.setMinimumSize(QSize(250, 200))
         self.gridLayout = QGridLayout(logDialogForm)
         self.gridLayout.setObjectName(u"gridLayout")
         self.logEditContainer = QWidget(logDialogForm)

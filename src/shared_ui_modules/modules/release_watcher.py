@@ -42,7 +42,7 @@ class ReleaseWatcherClass(QObject):
 
     def get_latest_name(self):
         try:
-            if not self.req_json:
+            if self.req_json is None:
                 raise Exception("null json")
 
             if self.req_json:

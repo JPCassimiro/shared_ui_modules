@@ -75,4 +75,5 @@ class SharedLogModel(QDialog):
             self.ui.retranslateUi(self)
             self.set_translatable_string()
             self.set_ui_texts()
+            self.logTextEdit.clear()
         return super().changeEvent(event)

@@ -80,7 +80,7 @@ class RegisterModel(QDialog):
         try:
             fileName = QFileDialog.getOpenFileName(self, "Open Image", "./", "Image Files (*.png *.jpg *.bmp)")
 
-            if not fileName:
+            if fileName is None:
                 raise Exception("null image filename")
 
             if fileName:

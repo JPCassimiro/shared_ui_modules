@@ -25,7 +25,7 @@ class SharedDbClass(QObject):
             self.db_name = self.get_db_name()
             #variable setup
 
-            if not self.initial_query_list or not self.db_name:
+            if self.initial_query_list is None or self.db_name is None:
                 raise(f"relevant components not recieved: {self.initial_query_list}, {self.db_name}")
 
             if self.db_name:

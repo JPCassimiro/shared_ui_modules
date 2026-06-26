@@ -56,7 +56,7 @@ class SharedBtSerialComm(QObject):
             logger.error(f"SharedBtSeriaComm alter_port_state error: {e}")
 
     def socket_none_check(self):
-        if not self.bt_socket:
+        if self.bt_socket is None:
             logger.debug(f"SharedBtSerialHandle none socket")
             self.port_error.emit()
             self.log_modal_message.emit(2)
@@ -118,6 +118,7 @@ class SharedBtSerialComm(QObject):
         except AttributeError as e:
             logger.error(f"SharedBtSerialComm send_message error: {e}")
             self.port_error.emit()
+            raise
 
     #gets message, decodes, sends signal
     def recieve_message(self):

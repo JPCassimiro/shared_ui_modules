@@ -56,10 +56,12 @@ class SharedUserStatsModel(QWidget):
                 for button in buttons:
                     button.setEnabled(True)
                 self.stopListening.setEnabled(False)
+                self.sessionComboBox.setEnabled(True)
             else:
                 for button in buttons:
                     button.setEnabled(False)
                 self.stopListening.setEnabled(True)
+                self.sessionComboBox.setEnabled(False)
         except Exception as e:
             logger.error(f"SharedUserStatsModel ui_state_watcher error: {e}")
 
@@ -100,7 +102,7 @@ class SharedUserStatsModel(QWidget):
             warning.setText(QCoreApplication.translate("WarningText", "Exportação realizada com sucesso. A pasta criada será aberta."))
             warning.setWindowModality(Qt.ApplicationModal)
             warning.show()
-            if not folder_path:
+            if folder_path is None:
                 raise Exception(f"null folder path: {folder_path}")
             else:
                 DekstopServicesClass().open_folder(folder_path)
@@ -218,7 +220,7 @@ class SharedUserStatsModel(QWidget):
     def assing_user(self,user_index,user_name):
         logger.debug(f"SharedUserStatsModel user_index:{user_index}, user_name:{user_name}")
         try:
-            if not user_index or not user_name:
+            if user_index is None or user_name is None:
                 raise Exception(f"null user_index or user_name: {user_index},{user_name}")
             self.current_user = user_index
             self.dataCollectorHandler.current_user_index = self.current_user
@@ -267,7 +269,7 @@ class SharedUserStatsModel(QWidget):
 
     def assing_latest_session(self,latest_session):
         try:
-            if not latest_session:
+            if latest_session is None:
                 raise Exception(f"null latest_session: {latest_session}")
             self.latest_session = latest_session
             self.dataCollectorHandler.current_session_index = latest_session

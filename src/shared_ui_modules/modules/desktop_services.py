@@ -13,9 +13,12 @@ class DekstopServicesClass(QObject):
 
     def open_folder(self, folderPath):
         try:
+            if folderPath is None:
+                raise Exception("null folderPath")
+
             url = QUrl.fromLocalFile(folderPath)
 
-            if not url:
+            if url is None:
                 raise Exception("null url")
 
             self.deskServ.openUrl(url)

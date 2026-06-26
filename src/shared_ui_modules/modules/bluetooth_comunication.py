@@ -77,7 +77,7 @@ class BluetoothCommClass(QObject):
             
     def spp_service_discovery(self):
         try:
-            if not self.local_device:
+            if self.local_device is None:
                 raise Exception("Adaptador bluetooth não encontrado")
 
             device_mode = self.local_device.hostMode() 
@@ -112,7 +112,7 @@ class BluetoothCommClass(QObject):
     ############################ toggle functions ###############################    
     def toggle_bluetooth(self):
         try:
-            if not self.local_device:
+            if self.local_device is None:
                 raise Exception("Adaptador bluetooth não encontrado")
 
             device_mode = self.local_device.hostMode() 
@@ -132,7 +132,7 @@ class BluetoothCommClass(QObject):
     ############################ pair/unpair functions ###############################    
     def pair_device(self,serviceUuid,deviceMacString):
         try:
-            if not self.local_device:
+            if self.local_device is None:
                 raise Exception("Adaptador bluetooth não encontrado")
             
             device_mode = self.local_device.hostMode() 
@@ -185,7 +185,7 @@ class BluetoothCommClass(QObject):
 
     def unpair_device(self,deviceMacString):
         try:
-            if not self.local_device:
+            if self.local_device is None:
                 raise Exception("Adaptador Bluetooth não encontrado")
             
             device_mode = self.local_device.hostMode() 
@@ -203,7 +203,7 @@ class BluetoothCommClass(QObject):
     ############################ hid functions ###############################           
     def hid_device_discovery(self):
         try:
-            if not self.local_device:
+            if self.local_device is None:
                 raise Exception("Adaptador Bluetooth não encontrado")
 
             device_mode = self.local_device.hostMode() 
@@ -350,7 +350,7 @@ class BluetoothCommClass(QObject):
         
     def unpair_all_devices(self):
         try:
-            if not self.local_device:
+            if self.local_device is None:
                 raise Exception("Adaptador Bluetooth não encontrado")
             
             device_mode = self.local_device.hostMode() 
@@ -369,7 +369,7 @@ class BluetoothCommClass(QObject):
     #tells process class to trigger btdiscovery with desired mac and target device name
     def spp_discovery_fallback(self,mac):
         try:
-            if not self.local_device:
+            if self.local_device is None:
                 raise Exception("Adaptador Bluetooth esta desligado. Tentado ligar o adaptador...")
             
             device_mode = self.local_device.hostMode() 

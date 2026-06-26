@@ -78,7 +78,7 @@ class SharedCalibrationModel(QWidget):
                         self.restartButton.setEnabled(False)
                     else:
                         self.restartButton.setEnabled(True)
-                    self.sideMenuDisableSignal.emit(True)
+                self.sideMenuDisableSignal.emit(True)
             else:
                 self.cancelButton.setEnabled(True)
                 self.restartButton.setEnabled(False)
@@ -148,7 +148,7 @@ class SharedCalibrationModel(QWidget):
             self.timer.stop()
             self.timeout_counter = 0
             if self.calibration_step == 0:
-                self.step_1_pressure = [0]
+                self.step_1_pressure = self.get_step_1_presusre()
             else:
                 self.step_2_pressure = [0]
             self.step_running_watcher = False
@@ -229,7 +229,7 @@ class SharedCalibrationModel(QWidget):
         
     def reset_variables(self):
         try:
-            self.step_1_pressure = [0]
+            self.step_1_pressure = self.get_step_1_presusre()
             self.step_2_pressure = [0]
             self.timeout_counter = 0
             self.calibration_step = 0
