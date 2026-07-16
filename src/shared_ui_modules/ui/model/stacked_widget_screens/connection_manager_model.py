@@ -88,7 +88,7 @@ class SharedConnectionManagerModel(QWidget):
     def device_container_style_change(self):
         try:
             if self._connected_device_watcher == False:
-                self.deviceContainerFrame.setStyleSheet("""background-color: #353231;""")
+                self.deviceContainerFrame.setStyleSheet("""background-color: #1D1B19;""")
             else:
                 self.deviceContainerFrame.setStyleSheet("""background-color: #F89E59;""")
         except Exception as e:
@@ -417,4 +417,13 @@ class SharedConnectionManagerModel(QWidget):
     def changeEvent(self, event):
         if event.type() == QEvent.Type.LanguageChange:
             self.ui.retranslateUi(self)
+            self.logger_window_translatable_strings = [
+                QCoreApplication.translate("LoggerWidgetText","Dispositivo selecionado:"),
+                QCoreApplication.translate("LoggerWidgetText","Emparelhando dispositivo selecionado, aguarde..."),
+                QCoreApplication.translate("LoggerWidgetText","Sucesso no emparelhamento"),
+                QCoreApplication.translate("LoggerWidgetText","Desemparelhando dispositivo, aguarde..."),
+                QCoreApplication.translate("LoggerWidgetText","Sucesso no desemparelhamento"),
+                QCoreApplication.translate("LoggerWidgetText","Fim da busca por dispositivos"),
+                QCoreApplication.translate("LoggerWidgetText","Procurando por dispositivos, aguarde...")
+            ]
         return super().changeEvent(event)

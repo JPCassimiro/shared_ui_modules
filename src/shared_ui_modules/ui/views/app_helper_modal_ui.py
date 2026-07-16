@@ -80,7 +80,7 @@ class Ui_appHelpDialog(object):
     def retranslateUi(self, appHelpDialog):
         appHelpDialog.setWindowTitle(QCoreApplication.translate("appHelpDialog", u"Dialog", None))
         self.utfprLogoLabel.setText("")
-        self.manualLinkLabel.setText(QCoreApplication.translate("appHelpDialog", u"<a href=\"file:///manual/manual.html\">Manual de usu\u00e1rio<a/>", None))
+        self.manualLinkLabel.setText("")
         self.githubLinkLabel.setText(QCoreApplication.translate("appHelpDialog", u"<a href=\"https://github.com/JPCassimiro/JHMR\">Reposit\u00f3rio no Github</a>", None))
     # retranslateUi
 

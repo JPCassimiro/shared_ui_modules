@@ -17,7 +17,8 @@ class SharedEndConfigModel(QDialog):
 
         self.string_list_messages = [
             QCoreApplication.translate("EndConfigDialogText","Erro ao configurar um atributo, refaça a configuração."),
-            QCoreApplication.translate("EndConfigDialogText","Atributos configurados com sucesso!")
+            QCoreApplication.translate("EndConfigDialogText","Atributos configurados com sucesso!"),
+            QCoreApplication.translate("EndConfigDialogText","Configurando atributos, aguarde...")
         ]
         
         self.ui = Ui_endConfigModalDialog()
@@ -30,8 +31,13 @@ class SharedEndConfigModel(QDialog):
 
         #get ui elements
         self.messageField = self.ui.messageField 
-
         self.finished.connect(self.finished_handler)
+    
+    def exec(self):
+        
+        self.messageField.append(self.string_list_messages[2])
+
+        return super().exec()
     
     @property
     def recieved_messages(self):
@@ -82,6 +88,11 @@ class SharedEndConfigModel(QDialog):
             self.ui.retranslateUi(self)
             self.string_list_components = [
                 QCoreApplication.translate("EndConfigDialogText","Finalizado"),
+            ]
+            self.string_list_messages = [
+                QCoreApplication.translate("EndConfigDialogText","Erro ao configurar um atributo, refaça a configuração."),
+                QCoreApplication.translate("EndConfigDialogText","Atributos configurados com sucesso!"),
+                QCoreApplication.translate("EndConfigDialogText","Configurando atributos, aguarde...")
             ]
             self.set_ui_text()
         return super().changeEvent(event)

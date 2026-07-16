@@ -42,10 +42,25 @@ class RegisterModel(QDialog):
         self.imageSelectButton.clicked.connect(self.select_image_button_handler)
         self.nameEdit.textChanged.connect(self.name_changed_handler)
         self.descriptionEdit.textChanged.connect(self.description_changed_handler)
+        self.rejected.connect(self.dialog_cancel_handle)
         
         # self.finished.connect(self.dialog_finish_handler)
 
         self.set_ui_text()
+
+    def dialog_cancel_handle(self):
+        try:
+            self.clear_fields()
+        except Exception as e:
+            logger.error(f"RegisterModel dialog_cancel_handle error: {e}")
+
+    def clear_fields(self):
+        try:
+            self.nameEdit.clear()
+            self.descriptionEdit.clear()
+        except Exception as e:
+            logger.error(f"RegisterModel clear_fields error: {e}") 
+            raise
 
     def set_ui_text(self):
         self.setWindowTitle(QCoreApplication.translate("RegisterDialogText", "Cadastro"))

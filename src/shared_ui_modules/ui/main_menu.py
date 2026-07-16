@@ -13,6 +13,11 @@ class SharedMainMenuWindow(QMainWindow):
             QCoreApplication.translate("MainMenuText","Joystick não está conectado")
         ]
 
+        self.conn_loss_dialog = QMessageBox(self)
+        self.conn_loss_dialog.setWindowTitle(self.main_menu_dialog_string_list[0])
+        self.conn_loss_dialog.setText(self.main_menu_dialog_string_list[1])
+        self.conn_loss_dialog.setWindowModality(Qt.ApplicationModal)
+
     def initialize_module(self):
         self.logModalButton.clicked.connect(self.log_button_handler)
         self.appConfigButton.clicked.connect(self.app_config_button_handler)
@@ -20,7 +25,7 @@ class SharedMainMenuWindow(QMainWindow):
 
         #bt connection error signal conn
         self.connection_manager_widget.confirmed_conn_loss.connect(self.conn_loss_dialog_handle)
-        self.btSerialHandle.port_error.connect(self.no_connection_dialog_handle)
+        self.btSerialHandle.no_connection.connect(self.no_connection_dialog_handle)
 
     def therapist_select_handler(self,infoDict):
         try:
@@ -91,11 +96,8 @@ class SharedMainMenuWindow(QMainWindow):
     def conn_loss_dialog_handle(self):
         try:
             self.stackedWidget.setCurrentIndex(0)
-            warning = QMessageBox(self)
-            warning.setWindowTitle(self.main_menu_dialog_string_list[0])
-            warning.setText(self.main_menu_dialog_string_list[1])
-            warning.setWindowModality(Qt.ApplicationModal)
-            warning.show()
+            self.conn_loss_dialog.show()
+            self.conn_loss_dialog.raise_()
         except Exception as e:
             logger.error(f"SharedMainMenuWindow conn_loss_dialog_handle error: {e}")
 

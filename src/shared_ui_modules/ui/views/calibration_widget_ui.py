@@ -39,6 +39,7 @@ class Ui_calibrationForm(object):
         self.buttonsContainer.setObjectName(u"buttonsContainer")
         self.gridLayout_5 = QGridLayout(self.buttonsContainer)
         self.gridLayout_5.setObjectName(u"gridLayout_5")
+        self.gridLayout_5.setContentsMargins(9, 4, 4, 4)
         self.restartButton = QPushButton(self.buttonsContainer)
         self.restartButton.setObjectName(u"restartButton")
 

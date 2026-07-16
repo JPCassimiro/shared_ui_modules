@@ -15,7 +15,7 @@ class SharedAppHelperModel(QDialog):
 
         self.string_list_components = [
             QCoreApplication.translate("AppHelperDialogText","Ajuda"),
-            QCoreApplication.translate("AppHelperDialogText","<a href='_internal/manual/manual.html'>Manual de usuário<a/>"),#has to be updated on linguist too
+            QCoreApplication.translate("AppHelperDialogText","<a href='_internal/manual/html/manual_pt-br.html'>Manual de usuário<a/>"),#has to be updated on linguist too
         ]
 
         self.repo_string = None
@@ -60,8 +60,9 @@ class SharedAppHelperModel(QDialog):
             self.ui.retranslateUi(self)
             self.string_list_components = [
                 QCoreApplication.translate("AppHelperDialogText","Ajuda"),
-                QCoreApplication.translate("AppHelperDialogText","<a href='_internal/manual/manual.html'>Manual de usuário<a/>"),#has to be updated on linguist too
+                QCoreApplication.translate("AppHelperDialogText","<a href='_internal/manual/html/manual_pt-br.html'>Manual de usuário<a/>"),#has to be updated on linguist too
             ]
+            self.repo_string = self.get_repo_string()
             self.string_list_components.append(self.repo_string)
             self.set_ui_text()
         return super().changeEvent(event)

@@ -17,6 +17,8 @@ from tzlocal import get_localzone
 
 class SharedUserStatsModel(QWidget):
 
+    sideMenuDisableSignal = Signal(bool)
+
     def __init__(self,dbHandleClass: SharedDbClass | None = None, btSerialHandle: SharedBtSerialComm | None = None, logModel = None):
         super().__init__()
 
@@ -57,11 +59,13 @@ class SharedUserStatsModel(QWidget):
                     button.setEnabled(True)
                 self.stopListening.setEnabled(False)
                 self.sessionComboBox.setEnabled(True)
+                self.sideMenuDisableSignal.emit(True)
             else:
                 for button in buttons:
                     button.setEnabled(False)
                 self.stopListening.setEnabled(True)
                 self.sessionComboBox.setEnabled(False)
+                self.sideMenuDisableSignal.emit(False)
         except Exception as e:
             logger.error(f"SharedUserStatsModel ui_state_watcher error: {e}")
 

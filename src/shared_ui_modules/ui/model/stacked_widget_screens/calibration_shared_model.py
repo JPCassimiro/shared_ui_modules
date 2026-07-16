@@ -180,6 +180,8 @@ class SharedCalibrationModel(QWidget):
     #500ms timer for sending the messages
     def start_button_handler(self):
         try:
+            if self.btSerialhandle.socket_none_check():
+                raise Exception("null socket")
             self.start_callibration()
         except Exception as e:
             logger.error(f"SharedCalibrationModel start_button_handler error: {e}")
@@ -340,7 +342,6 @@ class SharedCalibrationModel(QWidget):
 
     def update_instruction_ui(self):
         try:
-            self.set_translatable_strings()
             img_array = self.image_data[self.calibration_step]
             img_info = []
             for info in img_array:
@@ -357,5 +358,6 @@ class SharedCalibrationModel(QWidget):
     def changeEvent(self, event):
         if event.type() == QEvent.Type.LanguageChange:
             self.ui.retranslateUi(self)
+            self.set_translatable_strings()
             self.update_instruction_ui()
         return super().changeEvent(event)

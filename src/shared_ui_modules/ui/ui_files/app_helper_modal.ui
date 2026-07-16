@@ -81,7 +81,7 @@
          <item row="0" column="0">
           <widget class="QLabel" name="manualLinkLabel">
            <property name="text">
-            <string>&lt;a href=&quot;file:///manual/manual.html&quot;&gt;Manual de usuário&lt;a/&gt;</string>
+            <string/>
            </property>
            <property name="textFormat">
             <enum>Qt::TextFormat::RichText</enum>

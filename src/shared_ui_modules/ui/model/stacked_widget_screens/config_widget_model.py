@@ -1,6 +1,8 @@
-from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QWidget, QProxyStyle, QStyle, QStyleOptionSlider, QWidget, QStylePainter
+from PySide6.QtCore import QRectF
+from PySide6.QtGui import QColor
 from shared_ui_modules.modules.log_class import logger
-
+    
 class SharedConfigWidgetModel(QWidget):
     def __init__(self, btSerialHandle, LogModel):
         super().__init__()

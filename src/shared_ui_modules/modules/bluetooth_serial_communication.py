@@ -14,6 +14,7 @@ class SharedBtSerialComm(QObject):
     mesReceivedSignal = Signal(object)
     conn_lost = Signal()
     log_modal_message = Signal(int)
+    no_connection = Signal()
 
     def __init__(self, parent = None):
         super().__init__(parent)
@@ -57,9 +58,9 @@ class SharedBtSerialComm(QObject):
 
     def socket_none_check(self):
         if self.bt_socket is None:
-            logger.debug(f"SharedBtSerialHandle none socket")
             self.port_error.emit()
             self.log_modal_message.emit(2)
+            self.no_connection.emit()
             return True
         else:
             return False
@@ -67,7 +68,7 @@ class SharedBtSerialComm(QObject):
  # if port not open
     def open_port(self):
         if self.socket_none_check():
-            return
+            raise Exception("null socket")
         try:
             if not self.bt_socket.isOpen():
                 if not self.bt_socket.open(QIODevice.ReadWrite):
@@ -92,7 +93,7 @@ class SharedBtSerialComm(QObject):
     def swap_message_listner(self,op = 0):
         try:
             if self.socket_none_check():
-                return
+                raise Exception("null socket")
             self.bt_socket.readyRead.disconnect()
             if op == 0:#default
                 self.bt_socket.readyRead.connect(self.recieve_message)
@@ -110,7 +111,7 @@ class SharedBtSerialComm(QObject):
     #gets message from model class and writes it
     def send_message(self, message):
         if self.socket_none_check():
-            return
+            raise Exception("null socket")
         try:
             logger.debug(f"send_message message:{message}")
             encodedMessage = message.encode('utf-8')
@@ -123,7 +124,7 @@ class SharedBtSerialComm(QObject):
     #gets message, decodes, sends signal
     def recieve_message(self):
         if self.socket_none_check():
-            return
+            raise Exception("null socket")
         try:
             message_substrings = []#mesages to be sent
             data = self.bt_socket.readAll()#these messages can be recieved in any way at any time, so it can be split or concateneted
@@ -143,11 +144,12 @@ class SharedBtSerialComm(QObject):
         except AttributeError as e:
             logger.error(f"SharedBtSerialComm recieve_message error: {e}")
             self.port_error.emit()
+            raise
 
 #receives sensor readings
     def recieve_use_data_message(self):
         if self.socket_none_check():
-            return
+            raise Exception("null socket")
         try:
             if self.pause_var != True:
                 messages = []
@@ -168,6 +170,7 @@ class SharedBtSerialComm(QObject):
         except AttributeError as e:
             logger.error(f"SharedBtSerialComm recieve_use_data_message error: {e}")
             self.port_error.emit()
+            raise
 
     def create_service_socket(self, addr = None, uuid = None):
         try:
